@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.soulspace.restore.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="description" property="description" />
+        <result column="password" property="password" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar_image_id" property="avatarImageId"/>
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, description, password, nickname, avatar_image_id, create_time, update_time
+    </sql>
+    <select id="selectAllByUsername" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from um_t_user
+        where
+        username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countById" resultType="int">
+        select count(*)
+        from um_t_user
+        where id = #{id,jdbcType=NUMERIC}
+    </select>
+
+    <update id="updateNicknameOrAvatarImageIdById">
+        update um_t_user
+        <set>
+            <if test="nickname != null">nickname = #{nickname,jdbcType=VARCHAR},</if>
+            <if test="avatarImageId != null">avatar_image_id = #{avatarImageId,jdbcType=NUMERIC}</if>
+        </set>
+        where id = #{id,jdbcType=NUMERIC}
+    </update>
+
+    <select id="selectIdAndNicknameAndAvatarImageUriByUsername" resultType="xyz.soulspace.restore.dto.UserBasicDTO">
+        select um_t_user.id as user_id, um_t_user.nickname as nickname, im_i_image_info.image_path as avatar_uri
+        from um_t_user, im_i_image_info
+        where username = #{username,jdbcType=VARCHAR}
+            and im_i_image_info.id = um_t_user.avatar_image_id
+    </select>
+</mapper>

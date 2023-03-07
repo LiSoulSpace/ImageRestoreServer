@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.soulspace.restore.mapper.ImageInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.ImageInfo">
+        <id column="id" property="id" />
+        <result column="image_name" property="imageName" />
+        <result column="image_path" property="imagePath" />
+        <result column="image_md5" property="imageMd5" />
+        <result column="image_type" property="imageType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, image_name, image_path, image_md5, image_type, create_time, update_time
+    </sql>
+    <select id="selectById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_image_info
+        where
+        id = #{id,jdbcType=NUMERIC}
+    </select>
+    <select id="selectAllByImageMd5" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_image_info
+        where
+        image_md5 = #{imageMd5,jdbcType=VARCHAR}
+    </select>
+    <select id="selectAllPage" resultType="xyz.soulspace.restore.entity.ImageInfo">
+        select
+        im_i_image_info.id, image_name, image_path, image_md5, image_type, im_i_image_info.create_time, im_i_image_info.update_time
+        from im_i_image_info
+        <if test="userId != null">
+            , im_i_user_image_info
+            where im_i_user_image_info.user_id = #{userId}
+            and im_i_image_info.id = im_i_user_image_info.image_info_id
+        </if>
+        limit ${pageSize*(currentPage-1)},#{pageSize}
+    </select>
+    <update id="updateImageMd5ByImageName">
+        update im_i_image_info
+        set image_md5 = #{imageMd5,jdbcType=VARCHAR}
+        where image_name = #{imageName,jdbcType=VARCHAR}
+    </update>
+
+    <insert id="insertUserImageInfo">
+        insert into im_i_user_image_info (user_id, image_info_id)
+        value (#{userId}, #{imageInfoId});
+    </insert>
+
+    <select id="selectAllByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_image_info, im_i_user_image_info
+        where
+        im_i_user_image_info.id = #{id,jdbcType=NUMERIC}
+        and im_i_user_image_info.id = im_i_image_info
+    </select>
+    <select id="selectImagePathById" resultMap="BaseResultMap">
+        select image_path
+        from im_i_image_info
+        where id = #{id,jdbcType=NUMERIC}
+    </select>
+</mapper>

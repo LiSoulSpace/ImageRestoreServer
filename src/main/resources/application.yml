@@ -1,0 +1,48 @@
+spring:
+  profiles:
+    active: dev
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
+#    # Kafka Producer 配置项
+#    producer:
+#      acks: 1 # 0-不应答。1-leader 应答。all-所有 leader 和 follower 应答。
+#      retries: 3 # 发送失败时，重试发送的次数
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 消息的 key 的序列化
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer  # 消息的 value 的序列化
+#    # Kafka Consumer 配置项
+#    consumer:
+#      group-id: test-consumer-group
+#      auto-offset-reset: earliest # 设置消费者分组最初的消费进度为 earliest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      properties:
+#        spring:
+#          json:
+#            trusted:
+#              packages: xyz.soulspace.cinemaline.domain
+#    # Kafka Consumer Listener 监听器配置
+#    listener:
+#      missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
+
+
+redis:
+  database: imageRestore
+  key:
+    permissionList: 'ums:permissionList'
+  expire:
+    common: 86400 # 24小时
+
+Cros:
+  set-domain: 'www.lisoulspace.xyz:8080'
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    enabled: true
+    use-root-path: false
+    disable-swagger-default-url: true
+  api-docs:
+    enabled: true
+    path: /api-docs
+  packages-to-scan: xyz.soulspace.restore.controller
