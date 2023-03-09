@@ -122,16 +122,25 @@ public class ImageReadSaveTests {
                                 map.put("imagePath", image.toString().substring(51));
                                 String fileMD5 = MD5.create().digestHex(imageInputStream);
                                 map.put("imageMd5", fileMD5);
+                                boolean isHeightSaved = false;
+                                boolean isWidthSaved = false;
                                 for (Directory directory : metadata.getDirectories()) {
                                     for (Tag tag : directory.getTags()) {
                                         if (test.get()) log.info("{}", tag);
                                         if (set.contains(tag.getTagName())) {
-                                            if (tag.getTagName().equals("Image Height") ||
-                                                    tag.getTagName().equals("Image Width")) {
+                                            if (tag.getTagName().equals("Image Height") && !isHeightSaved) {
+                                                log.info("{}:{}", tag.getTagName(), tag.getDescription());
                                                 map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                                                isHeightSaved = true;
+                                            } else if (tag.getTagName().equals("Image Width") && !isWidthSaved) {
+                                                log.info("{}:{}", tag.getTagName(), tag.getDescription());
+                                                map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                                                isWidthSaved = true;
                                             } else {
                                                 String tagName = tag.getTagName();  //标签名
                                                 String desc = tag.getDescription(); //标签信息
+                                                if (tagName.equals("Image Height") ||tagName.equals("Image Width"))
+                                                    continue;
                                                 map.put(tagName, desc);
                                             }
                                         }
@@ -139,14 +148,14 @@ public class ImageReadSaveTests {
                                 }
                                 test.set(false);
                                 log.info("{}", map);
-//                                ImageInfo imageInfo = new ImageInfo();
-//                                imageInfo.setImageType(map.get("Detected File Type Name"));
-//                                imageInfo.setImageMd5(map.get("imageMd5"));
-//                                imageInfo.setImageHeight(Integer.valueOf(map.get("Image Height")));
-//                                imageInfo.setImageWidth(Integer.valueOf(map.get("Image Width")));
-//                                imageInfo.setImagePath(map.get("imagePath"));
-//                                imageInfo.setImageName(map.get("imageName"));
-//                                imageInfoMapper.insert(imageInfo);
+                                ImageInfo imageInfo = new ImageInfo();
+                                imageInfo.setImageType(map.get("Detected File Type Name"));
+                                imageInfo.setImageMd5(map.get("imageMd5"));
+                                imageInfo.setImageHeight(Integer.valueOf(map.get("Image Height")));
+                                imageInfo.setImageWidth(Integer.valueOf(map.get("Image Width")));
+                                imageInfo.setImagePath(map.get("imagePath"));
+                                imageInfo.setImageName(map.get("imageName"));
+                                imageInfoMapper.insert(imageInfo);
                                 imageInputStream.close();
                             }
                         } catch (ImageProcessingException | IOException e) {

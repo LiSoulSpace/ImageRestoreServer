@@ -2,6 +2,7 @@ package xyz.soulspace.restore.service.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.digest.MD5;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
@@ -12,15 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.entity.ImageInfo;
+import xyz.soulspace.restore.kafka.producer.RestoreProducer;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
 import xyz.soulspace.restore.service.ImageInfoService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>
@@ -52,6 +51,8 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
     String dataPath;
     @Value("${image.userImagePath}")
     String userImageDir;
+    @Autowired
+    RestoreProducer restoreProducer;
 
     @Override
     public List<String> getImagePathPage(Integer currentPage, Integer pageSize) {
@@ -126,15 +127,25 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             String fileMD5 = MD5.create().digestHex(imageInputStream);
             map.put("imageMd5", fileMD5);
 
+            boolean isHeightSaved = false;
+            boolean isWidthSaved = false;
+
             for (Directory directory : metadata.getDirectories()) {
                 for (Tag tag : directory.getTags()) {
                     if (set.contains(tag.getTagName())) {
-                        if (tag.getTagName().equals("Image Height") ||
-                                tag.getTagName().equals("Image Width")) {
+                        if (tag.getTagName().equals("Image Height") && !isHeightSaved) {
+                            log.info("{}:{}", tag.getTagName(), tag.getDescription());
                             map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                            isHeightSaved = true;
+                        } else if (tag.getTagName().equals("Image Width") && !isWidthSaved) {
+                            log.info("{}:{}", tag.getTagName(), tag.getDescription());
+                            map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                            isWidthSaved = true;
                         } else {
                             String tagName = tag.getTagName();  //标签名
                             String desc = tag.getDescription(); //标签信息
+                            if (tagName.equals("Image Height") ||tagName.equals("Image Width"))
+                                continue;
                             map.put(tagName, desc);
                         }
                     }
@@ -168,5 +179,19 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         List<ImageInfo> imageInfos = imageInfoMapper.selectImagePathById(id);
         if (imageInfos.size() == 0) return CommonResult.failed(1, "没有查找到图片", null);
         return CommonResult.success(imageInfos.get(0));
+    }
+
+    @Override
+    public CommonResult<?> imageRestoreById(Long id) {
+        List<ImageInfo> imageInfos = imageInfoMapper.selectById(id);
+        log.info("{}", imageInfos);
+        if (imageInfos.size() == 0) {
+            return CommonResult.failed(1, "没有找到id对应的图片", "");
+        } else {
+            ImageInfo imageInfo = imageInfos.get(0);
+            boolean b = restoreProducer.sendImageInfo(imageInfo);
+            if (b) return CommonResult.success("图像信息上传成功", "");
+            else return CommonResult.failed(2, "发送信息失败", "");
+        }
     }
 }

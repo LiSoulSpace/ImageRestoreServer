@@ -32,4 +32,6 @@ public interface ImageInfoService extends IService<ImageInfo> {
     CommonResult<?> saveUserImageRelation(ImageInfo savedImageInfo, Long userId);
 
     CommonResult<?> getImagePathById(Long id);
+
+    CommonResult<?> imageRestoreById(Long id);
 }

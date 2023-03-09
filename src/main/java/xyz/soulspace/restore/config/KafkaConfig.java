@@ -1,4 +1,4 @@
-package xyz.soulspace.cinemaline.config;
+package xyz.soulspace.restore.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -18,7 +18,7 @@ public class KafkaConfig {
     // 创建一个名为testtopic的Topic并设置分区数为8，分区副本数为2
     @Bean
     public NewTopic initialTopic() {
-        return TopicBuilder.name("topic-test").partitions(5).build();
+        return TopicBuilder.name("topic-image-restore").partitions(5).build();
     }
 
     // 如果要修改分区数，只需修改配置值重启项目即可

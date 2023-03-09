@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.entity.ImageInfo;
@@ -77,5 +77,14 @@ public class ImageInfoController {
     public ResponseEntity<?> getImagePathById(@Param("id") Long id) {
         CommonResult<?> imagePathById = imageInfoService.getImagePathById(id);
         return ResponseEntity.ok(imagePathById);
+    }
+
+    @Operation(summary = "通过图像id对图像进行处理")
+    @RequestMapping(value = "imageRestoreById", method = RequestMethod.POST)
+    public ResponseEntity<?> imageRestoreById(Long imageId) {
+        CommonResult<?> commonResult = imageInfoService.imageRestoreById(imageId);
+        if (commonResult.getCode()==0)
+        return ResponseEntity.ok(commonResult);
+        else return ResponseEntity.internalServerError().body(commonResult);
     }
 }
