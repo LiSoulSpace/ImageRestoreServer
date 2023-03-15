@@ -33,4 +33,6 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
     int insertUserImageInfo(@Param("userId") Long userId, @Param("imageInfoId") Long imageInfoId);
 
     List<ImageInfo> selectAllByUserId(@Param("id") Long userId);
+
+    int countByUserId(@Param("id") Long id);
 }

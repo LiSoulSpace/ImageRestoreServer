@@ -102,9 +102,14 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             try {
                 imageUpload.transferTo(fileSaveAbsolutePath);
                 CommonResult<?> saveImageInfoResult = saveImageInfo(fileSaveAbsolutePath);
-                if (saveImageInfoResult.isSuccess())
-                    return ResponseEntity.ok(CommonResult.success("文件上传完成", format));
-                else return ResponseEntity.internalServerError().body(saveImageInfoResult);
+                if (saveImageInfoResult.isSuccess()) {
+                    ImageInfo imageInfo = (ImageInfo) saveImageInfoResult.getData();
+                    CommonResult<?> commonResult = saveUserImageRelation(imageInfo, userId);
+                    if (commonResult.isSuccess()) {
+                        return ResponseEntity.ok(CommonResult.success("文件上传完成", format));
+                    } else return ResponseEntity.internalServerError().body(
+                            CommonResult.failed(4, "用户余图像的关系上传失败", null));
+                } else return ResponseEntity.internalServerError().body(saveImageInfoResult);
             } catch (IOException e) {
                 log.error(e.getMessage());
                 return ResponseEntity.internalServerError()
@@ -115,7 +120,11 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
 
     @Override
     public CommonResult<?> saveImageInfo(Path image) {
-        try (InputStream imageInputStream = Files.newInputStream(image)) {
+        try {
+            InputStream imageInputStream = Files.newInputStream(image);
+            String fileMD5 = MD5.create().digestHex(imageInputStream);
+            imageInputStream.close();
+            imageInputStream = Files.newInputStream(image);
             Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
             HashMap<String, String> map = new HashMap<>();
             Set<String> set = new HashSet<>();
@@ -124,7 +133,6 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             set.add("Image Width");
             map.put("imageName", String.valueOf(image.getFileName()));
             map.put("imagePath", image.toString().substring(dataPath.length()));
-            String fileMD5 = MD5.create().digestHex(imageInputStream);
             map.put("imageMd5", fileMD5);
 
             boolean isHeightSaved = false;
@@ -144,7 +152,7 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
                         } else {
                             String tagName = tag.getTagName();  //标签名
                             String desc = tag.getDescription(); //标签信息
-                            if (tagName.equals("Image Height") ||tagName.equals("Image Width"))
+                            if (tagName.equals("Image Height") || tagName.equals("Image Width"))
                                 continue;
                             map.put(tagName, desc);
                         }
@@ -192,6 +200,16 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             boolean b = restoreProducer.sendImageInfo(imageInfo);
             if (b) return CommonResult.success("图像信息上传成功", "");
             else return CommonResult.failed(2, "发送信息失败", "");
+        }
+    }
+
+    @Override
+    public CommonResult<?> countByUserId(Long id) {
+        try {
+            int i = imageInfoMapper.countByUserId(id);
+            return CommonResult.success(i);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "服务器出错", e.getMessage());
         }
     }
 }

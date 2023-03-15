@@ -15,12 +15,14 @@ public class RestoreConsumer {
     RedisService redisService;
 
     @KafkaListener(topics = {"topic-restore-answer"},
-            topicPartitions = {@TopicPartition(topic = "topic-restore-answer", partitions = {"2"})},
+            topicPartitions = {@TopicPartition(topic = "topic-restore-answer", partitions = {"0"})},
             groupId = "topic-restore-answer-group")
-    public void onOrder(ConsumerRecord<?, ?> record) {
+    public void onRestoreAnswer(ConsumerRecord<?, ?> record) {
         String key = (String) record.key();
-        if (key.equals("order")) {
-
+        log.info("key:[{}], value:[{}], partition:[{}], topic:[{}]",
+                record.key(), record.value(), record.partition(), record.topic());
+        if (key.equals("image_restore_answer")) {
+            log.info("{}", "接收到信息");
         }
     }
 

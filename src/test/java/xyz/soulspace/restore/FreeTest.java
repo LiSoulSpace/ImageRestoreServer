@@ -30,4 +30,14 @@ public class FreeTest {
         log.info("{}", s);
         log.info("{}", JSON.toJSONString(list));
     }
+
+    @Test
+    void testFastJson(){
+        Object parse = JSON.parse("{\"hello\":\"test\"}");
+        log.info("{}", parse);
+        Object parse1 = JSON.parse("""
+                [{"hello":"test"}, {"test":"hello"}]
+                """);
+        log.info("{}", parse1);
+    }
 }

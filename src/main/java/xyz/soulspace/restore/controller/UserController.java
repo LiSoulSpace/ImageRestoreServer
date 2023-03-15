@@ -55,7 +55,8 @@ public class UserController {
     @Operation(summary = "登录以后返回token")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody UserRequestBody user,
-                                   HttpServletRequest request, HttpServletResponse response) {
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
         Map<String, String> map = userService.login(user.getUsername(), user.getPassword());
         if (map.get("token") == null) {
             String msg = map.get("msg");

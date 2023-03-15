@@ -43,8 +43,8 @@ public class ImageInfoController {
     @RequestMapping(value = "/uploadImage", method = RequestMethod.POST,
             consumes = "multipart/*", headers = "content-type=multipart/form-data")
     public ResponseEntity<?> uploadImage(@RequestParam Long userId,
-                                         @RequestParam MultipartFile imageUpload) {
-        return imageInfoService.uploadImageByUserId(userId, imageUpload);
+                                         @RequestParam MultipartFile file) {
+        return imageInfoService.uploadImageByUserId(userId, file);
     }
 
     @Operation(summary = "分页获取图像路径信息")
@@ -61,6 +61,22 @@ public class ImageInfoController {
                                               @Param("pageSize") Integer pageSize) {
         List<ImageInfo> imagePathPage = imageInfoService.getImageInfoPage(currentPage, pageSize);
         return ResponseEntity.ok(CommonResult.success("success", JSON.toJSONString(imagePathPage)));
+    }
+
+    @Operation(summary = "获取公共图像数量")
+    @RequestMapping(value = "/getPublicImageCount", method = RequestMethod.GET)
+    public ResponseEntity<?> getPublicImageCount() {
+        CommonResult<?> countByUserId = imageInfoService.countByUserId(null);
+        return ResponseEntity.ok(countByUserId);
+    }
+
+    @Operation(summary = "根据用户id获取对应的图像数量")
+    @RequestMapping(value = "/getImageCountByUserId", method = RequestMethod.GET)
+    public ResponseEntity<?> getImageCountByUserId(
+            @RequestParam(value = "userId") Long userId
+    ) {
+        CommonResult<?> countByUserId = imageInfoService.countByUserId(userId);
+        return ResponseEntity.ok(countByUserId);
     }
 
     @Operation(summary = "分页获取某一用户图像所有信息")
@@ -83,8 +99,8 @@ public class ImageInfoController {
     @RequestMapping(value = "imageRestoreById", method = RequestMethod.POST)
     public ResponseEntity<?> imageRestoreById(Long imageId) {
         CommonResult<?> commonResult = imageInfoService.imageRestoreById(imageId);
-        if (commonResult.getCode()==0)
-        return ResponseEntity.ok(commonResult);
+        if (commonResult.getCode() == 0)
+            return ResponseEntity.ok(commonResult);
         else return ResponseEntity.internalServerError().body(commonResult);
     }
 }

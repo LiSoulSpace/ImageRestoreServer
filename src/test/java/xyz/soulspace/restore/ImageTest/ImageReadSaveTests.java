@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
+import xyz.soulspace.restore.service.ImageInfoService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,11 +32,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ImageReadSaveTests {
     @Autowired
     ImageInfoMapper imageInfoMapper;
+    @Autowired
+    ImageInfoService imageInfoService;
 
     @Test
     void getImageInfoPage() {
         List<ImageInfo> imageInfos = imageInfoMapper.selectAllPage(1, 10, null);
         log.info("{}", imageInfos.stream().map(ImageInfo::getImagePath).toList());
+    }
+
+    @Test
+    void getImageTotalCount(){
+        long count = imageInfoService.count();
+        log.info("count:[{}]", count);
+        int i = imageInfoMapper.countByUserId(null);
+        log.info("count_all:[{}]", i);
+        int i1 = imageInfoMapper.countByUserId(1L);
+        log.info("count_1L:[{}]", i1);
     }
 
     @Test
@@ -87,6 +100,13 @@ public class ImageReadSaveTests {
     }
 
     @Test
+    void md5Test() throws IOException {
+        InputStream imageInputStream = Files.newInputStream(Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/wallpaper/nasa_apod/Jupiter2_WebbSchmidt_3283_annotated.png"));
+        String fileMD5 = MD5.create().digestHex(imageInputStream);
+        log.info("{}", fileMD5);
+    }
+
+    @Test
     void getJpgInfo() throws IOException, ImageProcessingException {
         Path path = Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/wallpaper/nasa_apod/2021_03_02_Mars_Taurus_1800px.jpg");
         InputStream imageInputStream = Files.newInputStream(path);
@@ -111,6 +131,9 @@ public class ImageReadSaveTests {
                         try {
                             if (true) {
                                 InputStream imageInputStream = Files.newInputStream(image);
+                                String fileMD5 = MD5.create().digestHex(imageInputStream);
+                                imageInputStream.close();
+                                imageInputStream = Files.newInputStream(image);
                                 Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
                                 HashMap<String, String> map = new HashMap<>();
                                 Set<String> set = new HashSet<>();
@@ -120,20 +143,17 @@ public class ImageReadSaveTests {
                                 set.add("Number of Components");
                                 map.put("imageName", String.valueOf(image.getFileName()));
                                 map.put("imagePath", image.toString().substring(51));
-                                String fileMD5 = MD5.create().digestHex(imageInputStream);
                                 map.put("imageMd5", fileMD5);
+                                log.warn("{}:[{}]", image.getFileName(), fileMD5);
                                 boolean isHeightSaved = false;
                                 boolean isWidthSaved = false;
                                 for (Directory directory : metadata.getDirectories()) {
                                     for (Tag tag : directory.getTags()) {
-                                        if (test.get()) log.info("{}", tag);
                                         if (set.contains(tag.getTagName())) {
                                             if (tag.getTagName().equals("Image Height") && !isHeightSaved) {
-                                                log.info("{}:{}", tag.getTagName(), tag.getDescription());
                                                 map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
                                                 isHeightSaved = true;
                                             } else if (tag.getTagName().equals("Image Width") && !isWidthSaved) {
-                                                log.info("{}:{}", tag.getTagName(), tag.getDescription());
                                                 map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
                                                 isWidthSaved = true;
                                             } else {
