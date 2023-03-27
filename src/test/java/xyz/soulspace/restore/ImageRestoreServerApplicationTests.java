@@ -28,10 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class ImageRestoreServerApplicationTests {
     @Test
     void contextLoads() throws IOException {
-        InputStream inputStream = Files.newInputStream(
-                Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/avatar/jiaran.webp"));
-        String fileMD5 = MD5.create().digestHex(inputStream);
-        log.warn("{}", fileMD5);
+
     }
 
 

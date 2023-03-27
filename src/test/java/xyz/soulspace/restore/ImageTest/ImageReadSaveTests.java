@@ -42,7 +42,7 @@ public class ImageReadSaveTests {
     }
 
     @Test
-    void getImageTotalCount(){
+    void getImageTotalCount() {
         long count = imageInfoService.count();
         log.info("count:[{}]", count);
         int i = imageInfoMapper.countByUserId(null);
@@ -71,7 +71,7 @@ public class ImageReadSaveTests {
 
     @Test
     void getJiaRanInfo() throws IOException, ImageProcessingException {
-        Path path = Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/avatar/jiaran.webp");
+        Path path = Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/avatar/0b1dadbaa5aca035522a4dc6b4e514ca.webp");
         InputStream imageInputStream = Files.newInputStream(path);
         Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
         for (Directory directory : metadata.getDirectories()) {
@@ -121,8 +121,18 @@ public class ImageReadSaveTests {
     }
 
     @Test
-    void addImageInfoToDB() throws IOException {
-        Path imageWallpaper = Path.of("/home/soulspace/Documents/GitHub/ImageRestoreServer/img/wallpaper");
+    void addImageInfoToDBPath() {
+        String path = "/home/soulspace/Documents/GitHub/ImageRestoreServer/img/img_origin/wallpaper";
+        try {
+            addImageInfoToDB(path);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @Test
+    void addImageInfoToDB(String pathToRead) throws IOException {
+        Path imageWallpaper = Path.of(pathToRead);
         AtomicBoolean test = new AtomicBoolean(true);
         Files.list(imageWallpaper).forEach(file -> {
             if (Files.isDirectory(file)) {
@@ -144,7 +154,6 @@ public class ImageReadSaveTests {
                                 map.put("imageName", String.valueOf(image.getFileName()));
                                 map.put("imagePath", image.toString().substring(51));
                                 map.put("imageMd5", fileMD5);
-                                log.warn("{}:[{}]", image.getFileName(), fileMD5);
                                 boolean isHeightSaved = false;
                                 boolean isWidthSaved = false;
                                 for (Directory directory : metadata.getDirectories()) {
@@ -159,7 +168,7 @@ public class ImageReadSaveTests {
                                             } else {
                                                 String tagName = tag.getTagName();  //标签名
                                                 String desc = tag.getDescription(); //标签信息
-                                                if (tagName.equals("Image Height") ||tagName.equals("Image Width"))
+                                                if (tagName.equals("Image Height") || tagName.equals("Image Width"))
                                                     continue;
                                                 map.put(tagName, desc);
                                             }

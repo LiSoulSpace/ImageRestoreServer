@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import xyz.soulspace.restore.util.JwtTokenUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,8 @@ public class UserServiceImp extends ServiceImpl<UserMapper, User> implements Use
     RoleUserMapper roleUserMapper;
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+    @Value("${jwt.tokenHeader}")
+    private String tokenHeader;
 
     @Autowired
     ImageInfoMapper imageInfoMapper;
@@ -208,5 +211,11 @@ public class UserServiceImp extends ServiceImpl<UserMapper, User> implements Use
         token = token.substring(tokenHead.length());
         String username = jwtTokenUtil.getUserNameFromToken(token);
         return userMapper.selectIdAndNicknameAndAvatarImageUriByUsername(username);
+    }
+
+    @Override
+    public UserBasicDTO whoAmI(HttpServletRequest request) {
+        String token = request.getHeader(tokenHeader);
+        return whoAmI(token);
     }
 }

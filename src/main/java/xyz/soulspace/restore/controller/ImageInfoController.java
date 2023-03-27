@@ -13,14 +13,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
+import xyz.soulspace.restore.dto.UserBasicDTO;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.service.ImageInfoService;
+import xyz.soulspace.restore.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * <p>
- * 前端控制器
+ * 图像信息控制器
  * </p>
  *
  * @author soulspace
@@ -35,6 +38,8 @@ import java.util.List;
 public class ImageInfoController {
     @Autowired
     ImageInfoService imageInfoService;
+    @Autowired
+    UserService userService;
 
     @Value("${image.userImagePath}")
     String userImageDir;
@@ -95,10 +100,30 @@ public class ImageInfoController {
         return ResponseEntity.ok(imagePathById);
     }
 
-    @Operation(summary = "通过图像id对图像进行处理")
+    @Operation(summary = "通过图像id 图像修复")
     @RequestMapping(value = "imageRestoreById", method = RequestMethod.POST)
     public ResponseEntity<?> imageRestoreById(Long imageId) {
         CommonResult<?> commonResult = imageInfoService.imageRestoreById(imageId);
+        if (commonResult.getCode() == 0)
+            return ResponseEntity.ok(commonResult);
+        else return ResponseEntity.internalServerError().body(commonResult);
+    }
+
+    @Operation(summary = "通过图像id 生成图像缩略图")
+    @RequestMapping(value = "imageResizeById", method = RequestMethod.POST)
+    public ResponseEntity<?> imageResizeById(Long imageId,
+                                             HttpServletRequest request){
+        UserBasicDTO userBasicDTO = userService.whoAmI(request);
+        CommonResult<?> commonResult = imageInfoService.imageFixSmallById(imageId, userBasicDTO.getUserId());
+        if (commonResult.getCode() == 0)
+            return ResponseEntity.ok(commonResult);
+        else return ResponseEntity.internalServerError().body(commonResult);
+    }
+
+    @Operation(summary = "通过图像id 删除对应的图片及相关信息")
+    @RequestMapping(value = "deleteImageById", method = RequestMethod.POST)
+    public ResponseEntity<?> deleteImageById(Long imageId){
+        CommonResult<?> commonResult = imageInfoService.deleteImageInfoById(imageId);
         if (commonResult.getCode() == 0)
             return ResponseEntity.ok(commonResult);
         else return ResponseEntity.internalServerError().body(commonResult);

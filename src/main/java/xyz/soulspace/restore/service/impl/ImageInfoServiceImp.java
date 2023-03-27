@@ -95,25 +95,29 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
                 } catch (IOException e) {
                     log.warn(e.getMessage());
                     return ResponseEntity.internalServerError()
-                            .body(CommonResult.failed(4, "用户图像文件夹创建失败", e.getMessage()));
+                            .body(CommonResult.failed(1, "用户图像文件夹创建失败", e.getMessage()));
                 }
             }
             Path fileSaveAbsolutePath = Paths.get(String.valueOf(thisUserImagePath), originalFilename);
             try {
                 imageUpload.transferTo(fileSaveAbsolutePath);
                 CommonResult<?> saveImageInfoResult = saveImageInfo(fileSaveAbsolutePath);
-                if (saveImageInfoResult.isSuccess()) {
+                if (saveImageInfoResult.getCode() <= 1) {
                     ImageInfo imageInfo = (ImageInfo) saveImageInfoResult.getData();
+                    if (imageInfoMapper.isExistUserImageRelation(userId, imageInfo.getId()) > 0) {
+                        return ResponseEntity.internalServerError().body(
+                                CommonResult.failed(2, "已经存在对应的图像关系", null));
+                    }
                     CommonResult<?> commonResult = saveUserImageRelation(imageInfo, userId);
                     if (commonResult.isSuccess()) {
-                        return ResponseEntity.ok(CommonResult.success("文件上传完成", format));
+                        return ResponseEntity.ok(CommonResult.success("文件上传完成 关系绑定完成", format));
                     } else return ResponseEntity.internalServerError().body(
-                            CommonResult.failed(4, "用户余图像的关系上传失败", null));
+                            CommonResult.failed(3, "用户图像的关系上传失败", null));
                 } else return ResponseEntity.internalServerError().body(saveImageInfoResult);
             } catch (IOException e) {
                 log.error(e.getMessage());
                 return ResponseEntity.internalServerError()
-                        .body(CommonResult.failed(3, "图像保存失败", e.getMessage()));
+                        .body(CommonResult.failed(4, "图像保存失败", e.getMessage()));
             }
         }
     }
@@ -123,6 +127,8 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         try {
             InputStream imageInputStream = Files.newInputStream(image);
             String fileMD5 = MD5.create().digestHex(imageInputStream);
+            List<ImageInfo> imageInfos = imageInfoMapper.selectAllByImageMd5(fileMD5);
+            if (imageInfos.size() > 0) return CommonResult.failed(1, "图像已经存在", imageInfos.get(0));
             imageInputStream.close();
             imageInputStream = Files.newInputStream(image);
             Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
@@ -171,7 +177,7 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             return CommonResult.success("图像保存成功", imageInfo);
         } catch (ImageProcessingException | IOException e) {
             log.error(e.getMessage());
-            return CommonResult.failed(1, "图像保存失败", e.getMessage());
+            return CommonResult.failed(2, "图像保存失败", e.getMessage());
         }
     }
 
@@ -194,12 +200,12 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         List<ImageInfo> imageInfos = imageInfoMapper.selectById(id);
         log.info("{}", imageInfos);
         if (imageInfos.size() == 0) {
-            return CommonResult.failed(1, "没有找到id对应的图片", "");
+            return CommonResult.failed(1, "图像修复-没有找到id对应的图片", "");
         } else {
             ImageInfo imageInfo = imageInfos.get(0);
-            boolean b = restoreProducer.sendImageInfo(imageInfo);
-            if (b) return CommonResult.success("图像信息上传成功", "");
-            else return CommonResult.failed(2, "发送信息失败", "");
+            boolean b = restoreProducer.sendImageInfoForRestore(imageInfo);
+            if (b) return CommonResult.success("图像修复-图像信息上传成功", "");
+            else return CommonResult.failed(2, "图像修复-发送信息失败", "");
         }
     }
 
@@ -211,5 +217,37 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         } catch (Exception e) {
             return CommonResult.failed(1, "服务器出错", e.getMessage());
         }
+    }
+
+    @Override
+    public CommonResult<?> imageFixSmallById(Long id, Integer userId) {
+        List<ImageInfo> imageInfos = imageInfoMapper.selectById(id);
+        log.info("将要转换小图片的图像信息:{}", imageInfos);
+        if (imageInfos.size() == 0) {
+            return CommonResult.failed(1, "没有找到id对应的图片", "");
+        } else {
+            ImageInfo imageInfo = imageInfos.get(0);
+            boolean b = restoreProducer.sendImageInfoForResize(imageInfo, userId);
+            if (b) return CommonResult.success("图像信息上传成功", "");
+            else return CommonResult.failed(2, "发送信息失败", "");
+        }
+    }
+
+    @Override
+    public CommonResult<?> insertOriginSmallRelation(Long originImageId, Long smallImageId) {
+        int i = imageInfoMapper.insertOriginSmallRelation(originImageId, smallImageId);
+        if (i > 0) return CommonResult.success("原图像与缩略图关系保存成功");
+        return CommonResult.failed(1, "原图像与缩略图关系保存失败", null);
+    }
+
+    @Override
+    public CommonResult<?> deleteImageInfoById(Long imageId) {
+        int i = imageInfoMapper.deleteUserImageRelaByImageInfoId(imageId);
+        if (i > 0) {
+            int i1 = imageInfoMapper.deleteById(imageId);
+            if (i1 > 0) return CommonResult.success("删除完成", null);
+            else return CommonResult.failed(1, "删除图像信息失败", null);
+        } else
+            return CommonResult.failed(2, "删除图像用户联系信息失败", null);
     }
 }

@@ -5,6 +5,7 @@ import xyz.soulspace.restore.dto.UserBasicDTO;
 import xyz.soulspace.restore.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -35,4 +36,6 @@ public interface UserService extends IService<User> {
     User getByUserName(String username);
 
     UserBasicDTO whoAmI(String token);
+
+    UserBasicDTO whoAmI(HttpServletRequest request);
 }

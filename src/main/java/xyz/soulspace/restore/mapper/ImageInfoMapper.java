@@ -1,12 +1,11 @@
 package xyz.soulspace.restore.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
-import xyz.soulspace.restore.entity.ImageInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import xyz.soulspace.restore.entity.ImageInfo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -35,4 +34,15 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
     List<ImageInfo> selectAllByUserId(@Param("id") Long userId);
 
     int countByUserId(@Param("id") Long id);
+
+    int insertOriginSmallRelation(@Param("originId") Long originId,
+                                  @Param("smallId") Long small);
+
+    int countByImageMd5(@Param("imageMd5") String imageMd5);
+
+    int isExistUserImageRelation(@Param("userId") Long userId, @Param("image_info_id") Long imageInfoId);
+
+    int deleteUserImageRelaByImageInfoId(@Param("imageInfoId")Long imageInfoId);
+
+    int deleteByImageMd5(@Param("imageMd5") String imageMd5);
 }

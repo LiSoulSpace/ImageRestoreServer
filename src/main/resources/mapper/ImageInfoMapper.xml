@@ -55,6 +55,11 @@
             value (#{userId}, #{imageInfoId});
     </insert>
 
+    <insert id="insertOriginSmallRelation">
+        insert into im_i_origin_small_relation (origin_img_id, small_img_id)
+            value(#{originId}, #{smallId})
+    </insert>
+
     <select id="selectAllByUserId" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -77,4 +82,25 @@
             and im_i_user_image_info.image_info_id = im_i_image_info.id
         </if>
     </select>
+    <select id="countByImageMd5" resultType="int">
+        select count(*)
+        from im_i_image_info
+        where image_md5 = #{imageMd5,jdbcType=VARCHAR}
+    </select>
+    <select id="isExistUserImageRelation" resultType="int">
+        select count(*)
+        from im_i_user_image_info
+        where user_id = #{userId}
+          and image_info_id = #{image_info_id}
+    </select>
+    <delete id="deleteUserImageRelaByImageInfoId">
+        delete
+        from im_i_user_image_info
+        where image_info_id = #{imageInfoId}
+    </delete>
+    <delete id="deleteByImageMd5">
+        delete
+        from im_i_image_info
+        where image_md5 = #{imageMd5,jdbcType=VARCHAR}
+    </delete>
 </mapper>

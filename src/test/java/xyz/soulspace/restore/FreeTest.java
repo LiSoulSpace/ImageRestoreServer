@@ -1,6 +1,7 @@
 package xyz.soulspace.restore;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import xyz.soulspace.restore.entity.ImageInfo;
@@ -24,15 +25,18 @@ public class FreeTest {
         imageInfo.setUpdateTime(LocalDateTime.now());
         imageInfo.setImageType("est");
         String s = JSON.toJSONString(imageInfo);
-        List<ImageInfo> list = new ArrayList<>();
-        list.add(imageInfo);
-        list.add(imageInfo);
-        log.info("{}", s);
-        log.info("{}", JSON.toJSONString(list));
+        JSONObject o = (JSONObject) JSON.toJSON(imageInfo);
+        o.put("userId", 1);
+        log.info("{}", o);
+//        List<ImageInfo> list = new ArrayList<>();
+//        list.add(imageInfo);
+//        list.add(imageInfo);
+//        log.info("{}", s);
+//        log.info("{}", JSON.toJSONString(list));
     }
 
     @Test
-    void testFastJson(){
+    void testFastJson() {
         Object parse = JSON.parse("{\"hello\":\"test\"}");
         log.info("{}", parse);
         Object parse1 = JSON.parse("""

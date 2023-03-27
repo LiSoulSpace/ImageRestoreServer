@@ -36,4 +36,10 @@ public interface ImageInfoService extends IService<ImageInfo> {
     CommonResult<?> imageRestoreById(Long id);
 
     CommonResult<?> countByUserId(Long id);
+
+    CommonResult<?> imageFixSmallById(Long id, Integer userId);
+
+    CommonResult<?> insertOriginSmallRelation(Long originImageId, Long smallImageId);
+
+    CommonResult<?> deleteImageInfoById(Long imageId);
 }
