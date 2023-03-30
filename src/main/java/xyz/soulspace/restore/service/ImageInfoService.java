@@ -19,8 +19,21 @@ import java.util.List;
  * @since 2023-02-20 07:04:23
  */
 public interface ImageInfoService extends IService<ImageInfo> {
+    /**
+     * 分页获取图像路径信息
+     *
+     * @param currentPage 当前页数
+     * @param pageSize 每页大小
+     * @return 图像路径
+     */
     List<String> getImagePathPage(Integer currentPage, Integer pageSize);
 
+    /**
+     * 分页获取图像信息
+     * @param currentPage 当前页数
+     * @param pageSize 每页大小
+     * @return 图像信息列表
+     */
     List<ImageInfo> getImageInfoPage(Integer currentPage, Integer pageSize);
 
     List<ImageInfo> getImageInfoPageByUserId(Integer currentPage, Integer pageSize, Long userId);

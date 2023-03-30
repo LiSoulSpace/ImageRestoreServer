@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.soulspace.restore.mapper.TagMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.Tag">
+        <id column="id" property="id"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="tag_creator_id" property="tagCreatorId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , tag_name, tag_creator_id, create_time, update_time
+    </sql>
+
+    <insert id="insertTagImageRelation">
+        insert into im_i_image_tag_relation (image_id, tag_id)
+            value (#{imageId}, #{tagId});
+    </insert>
+    <insert id="insertByTagNameAndUserId">
+        insert into im_i_tag (tag_name, tag_creator_id)
+            value (#{tagName}, #{userId})
+    </insert>
+    <select id="findImageByTag" resultType="xyz.soulspace.restore.entity.ImageInfo">
+        select * from im_i_image_info where id in
+        (
+        select distinct r_0.image_id
+        from im_i_image_tag_relation as r_0
+        <foreach item="item" index="index" collection="tags"
+                 nullable="true">
+            inner join (select image_id
+            from im_i_image_tag_relation
+            where tag_id = #{item}) as r${index}
+            on r_0.image_id = r${index}.image_id
+        </foreach>
+        )
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+    </select>
+    <select id="findAllByTagNames" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+        where tag_name in
+        <foreach collection="tagNames" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectAllPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+        <if test="creatorId!=null">
+            where tag_creator_id = #{creatorId}
+        </if>
+        limit ${pageSize*(currentPage-1)},#{pageSize}
+    </select>
+    <select id="countByTagCreatorId" resultType="java.lang.Integer">
+        select count(*)
+        from im_i_tag
+        <if test="creatorId!=null">
+            where tag_creator_id = #{creatorId}
+        </if>
+    </select>
+</mapper>

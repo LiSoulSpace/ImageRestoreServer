@@ -34,7 +34,7 @@ public class Generator {
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(
-                            "test"
+                            "im_i_tag"
                             )
                             .addTablePrefix("main_", "um_t_", "im_i_")
                             .addTableSuffix("_table")
