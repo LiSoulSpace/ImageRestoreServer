@@ -38,6 +38,8 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
     int insertOriginSmallRelation(@Param("originId") Long originId,
                                   @Param("smallId") Long small);
 
+    Long selectSmallByOrigin(@Param("originId")Long originId);
+
     int countByImageMd5(@Param("imageMd5") String imageMd5);
 
     int isExistUserImageRelation(@Param("userId") Long userId, @Param("image_info_id") Long imageInfoId);

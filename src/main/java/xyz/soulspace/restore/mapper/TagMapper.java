@@ -18,14 +18,35 @@ import java.util.List;
  */
 @Mapper
 public interface TagMapper extends BaseMapper<Tag> {
+    /**
+     * 插入标签图像关系
+     * @param tagId tagId
+     * @param imageId imageId
+     * @return {@link int}
+     */
     int insertTagImageRelation(@Param("tagId") Long tagId,
                                @Param("imageId") Long imageId);
 
+    /**
+     * 插入 通过tagName和userId
+     * @param tagName tagName
+     * @param userId userId
+     * @return int
+     */
     int insertByTagNameAndUserId(@Param("tagName") String tagName,
                                  @Param("userId") Long userId);
 
+    /**
+     * 通过多标签筛选，获取图像信息
+     * @param tags 标签列表
+     * @return {@link List} {@link ImageInfo}
+     */
     List<ImageInfo> findImageByTag(@Param("tags") List<Long> tags);
 
+    /**
+     * 获取所有标签
+     * @return {@link List<Tag>}
+     */
     List<Tag> selectAll();
 
     List<Tag> selectAllPage(@Param("currentPage") Integer currentPage,

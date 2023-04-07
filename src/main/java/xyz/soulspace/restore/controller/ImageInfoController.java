@@ -111,10 +111,8 @@ public class ImageInfoController {
 
     @Operation(summary = "通过图像id 生成图像缩略图")
     @RequestMapping(value = "imageResizeById", method = RequestMethod.POST)
-    public ResponseEntity<?> imageResizeById(Long imageId,
-                                             HttpServletRequest request){
-        UserBasicDTO userBasicDTO = userService.whoAmI(request);
-        CommonResult<?> commonResult = imageInfoService.imageFixSmallById(imageId, userBasicDTO.getUserId());
+    public ResponseEntity<?> imageResizeById(Long imageId){
+        CommonResult<?> commonResult = imageInfoService.imageFixSmallById(imageId);
         if (commonResult.getCode() == 0)
             return ResponseEntity.ok(commonResult);
         else return ResponseEntity.internalServerError().body(commonResult);

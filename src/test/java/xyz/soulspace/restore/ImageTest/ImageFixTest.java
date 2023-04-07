@@ -28,11 +28,17 @@ public class ImageFixTest {
         for (int i = 1; i < 360; i++) {
             List<ImageInfo> infos = imageInfoMapper.selectById((long) i);
             if (infos.size() > 0) {
-                CommonResult<?> commonResult = imageInfoService.imageFixSmallById((long) i, 1);
+                CommonResult<?> commonResult = imageInfoService.imageFixSmallById((long) i);
                 if (!commonResult.isSuccess()) {
                     log.error("{}", commonResult);
                 }
             }
         }
+    }
+
+    @Test
+    void testForReturnNull(){
+        Long aLong = imageInfoMapper.selectSmallByOrigin(888L);
+        log.info("{}", aLong);
     }
 }

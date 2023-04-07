@@ -38,6 +38,12 @@ public interface ImageInfoService extends IService<ImageInfo> {
 
     List<ImageInfo> getImageInfoPageByUserId(Integer currentPage, Integer pageSize, Long userId);
 
+    /**
+     * 上传图片，并绑定与用户的关系
+     * @param userId 用户id
+     * @param imageUpload 上传的图像信息
+     * @return
+     */
     ResponseEntity<?> uploadImageByUserId(Long userId, MultipartFile imageUpload);
 
     CommonResult<?> saveImageInfo(Path imagePath);
@@ -50,7 +56,7 @@ public interface ImageInfoService extends IService<ImageInfo> {
 
     CommonResult<?> countByUserId(Long id);
 
-    CommonResult<?> imageFixSmallById(Long id, Integer userId);
+    CommonResult<?> imageFixSmallById(Long id);
 
     CommonResult<?> insertOriginSmallRelation(Long originImageId, Long smallImageId);
 

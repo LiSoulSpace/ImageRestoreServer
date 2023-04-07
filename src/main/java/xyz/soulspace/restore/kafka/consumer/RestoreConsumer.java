@@ -43,7 +43,6 @@ public class RestoreConsumer {
             Map<String, Object> map = (Map<String, Object>) jsonObject;
             int id = (Integer) map.get("id");
             String smallImagePath = (String) map.get("result");
-            int userId = (Integer) map.get("userId");
             CommonResult<?> commonResult = imageInfoService.saveImageInfo(Path.of(smallImagePath));
             if (commonResult.isSuccess()) {
                 ImageInfo data = (ImageInfo) commonResult.getData();

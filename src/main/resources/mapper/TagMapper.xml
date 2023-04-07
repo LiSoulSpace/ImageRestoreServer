@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.Tag">
         <id column="id" property="id"/>
         <result column="tag_name" property="tagName"/>
+        <result column="tag_name_pinyin" property="tagNamePinyin"/>
         <result column="tag_creator_id" property="tagCreatorId"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -14,7 +15,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , tag_name, tag_creator_id, create_time, update_time
+        , tag_name, tag_name_pinyin, tag_creator_id, create_time, update_time
     </sql>
 
     <insert id="insertTagImageRelation">

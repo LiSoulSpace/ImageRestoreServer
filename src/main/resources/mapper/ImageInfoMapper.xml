@@ -93,6 +93,11 @@
         where user_id = #{userId}
           and image_info_id = #{image_info_id}
     </select>
+    <select id="selectSmallByOrigin" resultType="java.lang.Long">
+        select small_img_id
+        from im_i_origin_small_relation
+        where origin_img_id = #{originId}
+    </select>
     <delete id="deleteUserImageRelaByImageInfoId">
         delete
         from im_i_user_image_info
