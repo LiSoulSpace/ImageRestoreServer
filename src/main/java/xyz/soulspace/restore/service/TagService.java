@@ -35,6 +35,7 @@ public interface TagService extends IService<Tag> {
 
     /**
      * 通过标签查找图片
+     *
      * @param tags 标签信息 String
      * @return {@link CommonResult}
      */
@@ -44,15 +45,30 @@ public interface TagService extends IService<Tag> {
      * 分页获取标签
      *
      * @param currentPage 当前页数
-     * @param pageSize 每页数量
+     * @param pageSize    每页数量
      * @return {@link CommonResult}
      */
     CommonResult<?> getTagsByCreatorIdPage(Integer currentPage, Integer pageSize, Long creatorId);
 
     /**
      * 根据creatorId获取标签数量
+     *
      * @param creatorId 标签创建者id
      * @return {@link CommonResult}
      */
     CommonResult<?> countByCreatorId(Long creatorId);
+
+    /**
+     * 获取主要标签
+     *
+     * @return {@link CommonResult}
+     */
+    CommonResult<?> getMainTags();
+
+    /**
+     * 获取公共标签
+     *
+     * @return {@link CommonResult}
+     */
+    CommonResult<?> getPublicTags();
 }

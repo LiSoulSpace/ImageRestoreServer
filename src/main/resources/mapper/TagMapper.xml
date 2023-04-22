@@ -15,7 +15,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , tag_name, tag_name_pinyin, tag_creator_id, create_time, update_time
+        , tag_name, tag_name_pinyin,is_public_tag,is_main_tag, tag_creator_id, create_time, update_time
     </sql>
 
     <insert id="insertTagImageRelation">
@@ -70,4 +70,17 @@
             where tag_creator_id = #{creatorId}
         </if>
     </select>
+    <select id="getMainTags" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+        where is_main_tag=1
+    </select>
+    <select id="getPublicTags" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+        where is_public_tag=1
+    </select>
+
 </mapper>

@@ -13,12 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
-import xyz.soulspace.restore.dto.UserBasicDTO;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.service.ImageInfoService;
 import xyz.soulspace.restore.service.UserService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -93,11 +91,20 @@ public class ImageInfoController {
         return ResponseEntity.ok(CommonResult.success("success", JSON.toJSONString(imageInfoPageByUserId)));
     }
 
+    @Operation(summary = "通过图像md5获取图像信息")
+    @RequestMapping(value = "/getImageInfoByMd5", method = RequestMethod.GET)
+    public ResponseEntity<?> getImageInfoByMd5(@Param("imageMd5") String imageMd5) {
+        CommonResult<?> imageInfoByMd5 = imageInfoService.getImageInfoByMd5(imageMd5);
+        if (imageInfoByMd5.isSuccess()) return ResponseEntity.ok(JSON.toJSONString(imageInfoByMd5));
+        else return ResponseEntity.internalServerError().body(imageInfoByMd5);
+    }
+
     @Operation(summary = "通过图像id获取图像路径")
     @RequestMapping(value = "/getImagePathById", method = RequestMethod.GET)
     public ResponseEntity<?> getImagePathById(@Param("id") Long id) {
         CommonResult<?> imagePathById = imageInfoService.getImagePathById(id);
-        return ResponseEntity.ok(imagePathById);
+        if (imagePathById.isSuccess()) return ResponseEntity.ok(imagePathById);
+        else return ResponseEntity.internalServerError().body(imagePathById);
     }
 
     @Operation(summary = "通过图像id 图像修复")
@@ -111,7 +118,7 @@ public class ImageInfoController {
 
     @Operation(summary = "通过图像id 生成图像缩略图")
     @RequestMapping(value = "imageResizeById", method = RequestMethod.POST)
-    public ResponseEntity<?> imageResizeById(Long imageId){
+    public ResponseEntity<?> imageResizeById(Long imageId) {
         CommonResult<?> commonResult = imageInfoService.imageFixSmallById(imageId);
         if (commonResult.getCode() == 0)
             return ResponseEntity.ok(commonResult);
@@ -120,7 +127,7 @@ public class ImageInfoController {
 
     @Operation(summary = "通过图像id 删除对应的图片及相关信息")
     @RequestMapping(value = "deleteImageById", method = RequestMethod.POST)
-    public ResponseEntity<?> deleteImageById(Long imageId){
+    public ResponseEntity<?> deleteImageById(Long imageId) {
         CommonResult<?> commonResult = imageInfoService.deleteImageInfoById(imageId);
         if (commonResult.getCode() == 0)
             return ResponseEntity.ok(commonResult);

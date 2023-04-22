@@ -44,7 +44,7 @@ public class TagController {
     public ResponseEntity<?> saveTagInfo(@Param("currentPage") String tagName,
                                          HttpServletRequest request) {
         UserBasicDTO userBasicDTO = userService.whoAmI(request);
-        CommonResult<?> commonResult = tagService.saveTag(tagName, (long) userBasicDTO.getUserId());
+        CommonResult<?> commonResult = tagService.saveTag(tagName, userBasicDTO.getUserId());
         if (commonResult.isSuccess()) return ResponseEntity.ok(commonResult);
         else return ResponseEntity.internalServerError().body(commonResult);
     }
@@ -66,12 +66,20 @@ public class TagController {
         else return ResponseEntity.internalServerError().body(imageByTags);
     }
 
-    @Operation(summary = "通过创建者id获取标签信息")
+    @Operation(summary = "通过创建者id分页获取标签(Tag)信息")
     @RequestMapping(value = "getTagsByCreatorIdPage", method = RequestMethod.GET)
     public ResponseEntity<?> getTagsByCreatorIdPage(@Param("currentPage") Integer currentPage,
                                                     @Param("pageSize") Integer pageSize,
                                                     @Param("creatorId") Integer creatorId) {
         CommonResult<?> tagsByCreatorIdPage = tagService.getTagsByCreatorIdPage(currentPage, pageSize, Long.valueOf(creatorId));
+        if (tagsByCreatorIdPage.isSuccess()) return ResponseEntity.ok(tagsByCreatorIdPage);
+        else return ResponseEntity.internalServerError().body(tagsByCreatorIdPage);
+    }
+
+    @Operation(summary = "通过创建者id获取全部标签(Tag)信息")
+    @RequestMapping(value = "getTagsByCreatorId", method = RequestMethod.GET)
+    public ResponseEntity<?> getTagsByCreatorId(@Param("creatorId") Integer creatorId) {
+        CommonResult<?> tagsByCreatorIdPage = tagService.getTagsByCreatorIdPage(1, Integer.MAX_VALUE, Long.valueOf(creatorId));
         if (tagsByCreatorIdPage.isSuccess()) return ResponseEntity.ok(tagsByCreatorIdPage);
         else return ResponseEntity.internalServerError().body(tagsByCreatorIdPage);
     }
@@ -82,5 +90,21 @@ public class TagController {
         CommonResult<?> countByCreatorId = tagService.countByCreatorId(creatorId);
         if (countByCreatorId.isSuccess()) return ResponseEntity.ok(countByCreatorId);
         else return ResponseEntity.internalServerError().body(countByCreatorId);
+    }
+
+    @Operation(summary = "获取主要标签")
+    @RequestMapping(value = "getMainTags", method = RequestMethod.GET)
+    public ResponseEntity<?> getMainTags() {
+        CommonResult<?> mainTags = tagService.getMainTags();
+        if (mainTags.isSuccess()) return ResponseEntity.ok(mainTags);
+        else return ResponseEntity.internalServerError().body(mainTags);
+    }
+
+    @Operation(summary = "获取公共标签")
+    @RequestMapping(value = "getPublicTags", method = RequestMethod.GET)
+    public ResponseEntity<?> getPublicTags() {
+        CommonResult<?> publicTags = tagService.getPublicTags();
+        if (publicTags.isSuccess()) return ResponseEntity.ok(publicTags);
+        else return ResponseEntity.internalServerError().body(publicTags);
     }
 }

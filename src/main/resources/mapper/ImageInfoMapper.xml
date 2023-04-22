@@ -9,6 +9,8 @@
         <result column="image_path" property="imagePath"/>
         <result column="image_md5" property="imageMd5"/>
         <result column="image_type" property="imageType"/>
+        <result column="image_height" property="imageHeight"/>
+        <result column="image_width" property="imageWidth"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
@@ -16,7 +18,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , image_name, image_path, image_md5, image_type, create_time, update_time
+        , image_name, image_path, image_md5, image_type,image_height, image_width, create_time, update_time
     </sql>
     <select id="selectById" resultMap="BaseResultMap">
         select
@@ -34,7 +36,7 @@
     </select>
     <select id="selectAllPage" resultType="xyz.soulspace.restore.entity.ImageInfo">
         select
-        im_i_image_info.id, image_name, image_path, image_md5, image_type, im_i_image_info.create_time,
+        im_i_image_info.id, image_name, image_path, image_md5, image_type,image_height, image_width, im_i_image_info.create_time,
         im_i_image_info.update_time
         from im_i_image_info
         <if test="userId != null">

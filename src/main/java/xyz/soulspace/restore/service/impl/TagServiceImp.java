@@ -81,10 +81,42 @@ public class TagServiceImp extends ServiceImpl<TagMapper, Tag> implements TagSer
 
     /**
      * @param creatorId 标签创建者id
-     * @return
+     * @return 1:获取失败
      */
     @Override
     public CommonResult<?> countByCreatorId(Long creatorId) {
-        return null;
+        try {
+            Integer integer = tagMapper.countByTagCreatorId(creatorId);
+            return CommonResult.success("", integer);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "", e.getMessage());
+        }
+    }
+
+
+    /**
+     * @return 1:获取失败
+     */
+    @Override
+    public CommonResult<?> getMainTags() {
+        try {
+            List<Tag> mainTags = tagMapper.getMainTags();
+            return CommonResult.success("主要标签", mainTags);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "主要标签获取失败", e.getMessage());
+        }
+    }
+
+    /**
+     * @return 1:获取失败
+     */
+    @Override
+    public CommonResult<?> getPublicTags() {
+        try {
+            List<Tag> publicTags = tagMapper.getPublicTags();
+            return CommonResult.success("公共标签", publicTags);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "公共标签获取失败", e.getMessage());
+        }
     }
 }

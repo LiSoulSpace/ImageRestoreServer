@@ -33,16 +33,44 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
 
     List<ImageInfo> selectAllByUserId(@Param("id") Long userId);
 
+    /**
+     * 获取每个用户的图像数量
+     * @param id userId
+     * @return int
+     */
     int countByUserId(@Param("id") Long id);
 
+    /**
+     * 插入原图与缩略图的关系
+     * @param originId 原图id
+     * @param small 缩略图id
+     * @return {@link int}
+     */
     int insertOriginSmallRelation(@Param("originId") Long originId,
                                   @Param("smallId") Long small);
 
+    /**
+     * 通过原图像获取缩略图id
+     * @param originId 原图id
+     * @return {@link Long}
+     */
     Long selectSmallByOrigin(@Param("originId")Long originId);
 
+    /**
+     * 通过md5获取图像是否存在
+     * @param imageMd5 图像的md5
+     * @return int
+     */
     int countByImageMd5(@Param("imageMd5") String imageMd5);
 
-    int isExistUserImageRelation(@Param("userId") Long userId, @Param("image_info_id") Long imageInfoId);
+    /**
+     * 判断是否存在用户图像关系
+     * @param userId 用户id
+     * @param imageInfoId 图像信息id
+     * @return int
+     */
+    int isExistUserImageRelation(@Param("userId") Long userId,
+                                 @Param("image_info_id") Long imageInfoId);
 
     int deleteUserImageRelaByImageInfoId(@Param("imageInfoId")Long imageInfoId);
 

@@ -2,6 +2,7 @@ package xyz.soulspace.restore.service.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.digest.MD5;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
@@ -130,6 +131,17 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         }
     }
 
+    /**
+     * @param md5 md5
+     * @return
+     */
+    @Override
+    public CommonResult<?> getImageInfoByMd5(String md5) {
+        List<ImageInfo> imageInfos = imageInfoMapper.selectAllByImageMd5(md5);
+        if (imageInfos.size() == 0) return CommonResult.failed(1, "没有找到对应的图片", "");
+        else return CommonResult.success("图像信息获取完成", JSON.toJSONString(imageInfos.get(0)));
+    }
+
     @Override
     public CommonResult<?> saveImageInfo(Path image) {
         try {
@@ -242,7 +254,7 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
         } else {
             ImageInfo imageInfo = imageInfos.get(0);
             Long smallImgId = imageInfoMapper.selectSmallByOrigin(imageInfo.getId());
-            if (smallImgId != null)return CommonResult.success("图像对应信息已经存在", "");
+            if (smallImgId != null) return CommonResult.success("图像对应信息已经存在", "");
             boolean b = restoreProducer.sendImageInfoForResize(imageInfo);
             if (b) return CommonResult.success("图像信息上传成功", "");
             else return CommonResult.failed(2, "发送信息失败", "");

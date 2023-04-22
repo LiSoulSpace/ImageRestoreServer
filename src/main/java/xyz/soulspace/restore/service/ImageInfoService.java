@@ -46,6 +46,13 @@ public interface ImageInfoService extends IService<ImageInfo> {
      */
     ResponseEntity<?> uploadImageByUserId(Long userId, MultipartFile imageUpload);
 
+    /**
+     * 通过md5获取图像信息
+     * @param md5 md5
+     * @return {@link CommonResult}
+     */
+    CommonResult<?> getImageInfoByMd5(String md5);
+
     CommonResult<?> saveImageInfo(Path imagePath);
 
     CommonResult<?> saveUserImageRelation(ImageInfo savedImageInfo, Long userId);

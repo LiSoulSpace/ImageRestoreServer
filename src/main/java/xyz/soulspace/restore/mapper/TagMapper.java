@@ -56,4 +56,16 @@ public interface TagMapper extends BaseMapper<Tag> {
     List<Tag> findAllByTagNames(@Param("tagNames") List<String> tagNames);
 
     Integer countByTagCreatorId(@Param("creatorId") Long creatorId);
+
+    /**
+     * 获取主要标签，用于固定的选项显示
+     * @return {@link List} {@link Tag}
+     */
+    List<Tag> getMainTags();
+
+    /**
+     * 获取公共标签
+     * @return {@link List} {@link Tag}
+     */
+    List<Tag> getPublicTags();
 }
