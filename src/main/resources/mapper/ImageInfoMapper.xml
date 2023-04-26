@@ -46,6 +46,22 @@
         </if>
         limit ${pageSize*(currentPage-1)},#{pageSize}
     </select>
+    <select id="selectImageBaseInfoPage" resultType="xyz.soulspace.restore.dto.ImageBaseInfoDTO">
+        select iiii.image_name, iiii.image_path as source_path, iiii2.image_path as thumbnail_path, iiii.image_md5
+        from im_i_image_info iiii
+        join im_i_origin_small_relation iiosr on iiii.id = iiosr.origin_img_id
+        join im_i_image_info iiii2 on iiosr.small_img_id = iiii2.id
+        <if test="userId != null">
+            , im_i_user_image_info iiuii
+            where iiuii.user_id= #{userId}
+            and iiosr.origin_img_id = iiuii.image_info_id
+        </if>
+        <if test="userId == null">
+            where iiosr.is_public=1
+        </if>
+        limit ${pageSize*(currentPage-1)},#{pageSize};
+    </select>
+
     <update id="updateImageMd5ByImageName">
         update im_i_image_info
         set image_md5 = #{imageMd5,jdbcType=VARCHAR}
@@ -67,8 +83,8 @@
         <include refid="Base_Column_List"/>
         from im_i_image_info, im_i_user_image_info
         where
-        im_i_user_image_info.id = #{id,jdbcType=NUMERIC}
-        and im_i_user_image_info.id = im_i_image_info
+        im_i_user_image_info.user_id = #{id,jdbcType=NUMERIC}
+        and im_i_user_image_info.image_info_id = im_i_image_info.id
     </select>
     <select id="selectImagePathById" resultMap="BaseResultMap">
         select image_path
@@ -100,6 +116,7 @@
         from im_i_origin_small_relation
         where origin_img_id = #{originId}
     </select>
+
     <delete id="deleteUserImageRelaByImageInfoId">
         delete
         from im_i_user_image_info

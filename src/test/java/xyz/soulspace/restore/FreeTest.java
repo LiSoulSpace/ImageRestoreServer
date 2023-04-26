@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import xyz.soulspace.restore.entity.ImageInfo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 public class FreeTest {
@@ -43,5 +41,12 @@ public class FreeTest {
                 [{"hello":"test"}, {"test":"hello"}]
                 """);
         log.info("{}", parse1);
+    }
+
+    @Test
+    void testParseObject() {
+        String s = "{\"id\":2018, \"result\":\"/home/soulspace/Documents/GitHub/ImageRestoreServer/img/img_small/pexels/cat/cat_33_small.jpeg\"} ";
+        JSONObject jsonObject = JSON.parseObject(s);
+        log.info(jsonObject.toString());
     }
 }

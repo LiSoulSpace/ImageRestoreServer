@@ -40,12 +40,20 @@ public class SecurityConfig {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity
                 .authorizeRequests();
         // 不需要保护的资源路径允许访问
+//        for (String url : ignoreUrlsConfig().getUrls()) {
+//            registry.requestMatchers(url).permitAll();
+//        }
+//        // 允许跨域的OPTIONS请求
+//        registry.requestMatchers(HttpMethod.OPTIONS)
+//                .permitAll();
+
         for (String url : ignoreUrlsConfig().getUrls()) {
             registry.antMatchers(url).permitAll();
         }
         // 允许跨域的OPTIONS请求
         registry.antMatchers(HttpMethod.OPTIONS)
                 .permitAll();
+
         // 其他任何请求都需要身份认证
         registry.and()
                 .authorizeRequests()

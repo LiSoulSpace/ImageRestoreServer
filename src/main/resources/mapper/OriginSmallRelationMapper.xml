@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.soulspace.restore.mapper.OriginSmallRelationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.OriginSmallRelation">
+        <id column="id" property="id" />
+        <result column="origin_img_id" property="originImgId" />
+        <result column="small_img_id" property="smallImgId" />
+        <result column="is_public" property="public" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, origin_img_id, small_img_id, is_public, description, create_time, update_time
+    </sql>
+    <select id="selectAllByIsPublic" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_origin_small_relation
+        where
+        is_public = #{isPublic,jdbcType=NUMERIC}
+    </select>
+    <select id="countByIsPublic" resultType="java.lang.Integer">
+        select count(*)
+        from im_i_origin_small_relation
+        where is_public = #{isPublic,jdbcType=NUMERIC}
+    </select>
+
+</mapper>

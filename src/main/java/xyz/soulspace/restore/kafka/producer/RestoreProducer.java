@@ -11,6 +11,8 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import xyz.soulspace.restore.entity.ImageInfo;
 
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @Component
 public class RestoreProducer {
@@ -94,19 +96,19 @@ public class RestoreProducer {
         return false;
     }
 
-    public String sendString(String order) {
-        ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send("topic-test", 0, "string", order);
-        send.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable ex) {
-                log.error(ex.getMessage());
-            }
-
-            @Override
-            public void onSuccess(SendResult<String, String> result) {
-                log.warn(result.toString());
-            }
-        });
-        return "Send OK";
-    }
+//    public String sendString(String order) {
+//        ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send("topic-test", 0, "string", order);
+//        send.addCallback(new ListenableFutureCallback<>() {
+//            @Override
+//            public void onFailure(Throwable ex) {
+//                log.error(ex.getMessage());
+//            }
+//
+//            @Override
+//            public void onSuccess(SendResult<String, String> result) {
+//                log.warn(result.toString());
+//            }
+//        });
+//        return "Send OK";
+//    }
 }

@@ -32,27 +32,33 @@ public class RestoreConsumer {
         log.info("key:[{}], value:[{}], partition:[{}], topic:[{}]",
                 record.key(), record.value(), record.partition(), record.topic());
         if (key.equals("image_restore_answer")) {
+            //TODO: 图像修复的回馈处理还没有写！！！！
             log.info("Answer from 图像修复:[{}]", record.value());
-        }else if(key.equals("image_resize_answer")){
+        } else if (key.equals("image_resize_answer")) {
             log.info("Answer from 图像缩略:[{}]", record.value());
             log.info("开始作后续处理");
             CommonResult<?> result = JSON.parseObject((String) record.value(), CommonResult.class);
-            log.info("{}", result.getData());
-            JSONObject jsonObject = JSONObject.parseObject((String) result.getData());
-            //json对象转Map
-            Map<String, Object> map = (Map<String, Object>) jsonObject;
-            int id = (Integer) map.get("id");
-            String smallImagePath = (String) map.get("result");
-            CommonResult<?> commonResult = imageInfoService.saveImageInfo(Path.of(smallImagePath));
-            if (commonResult.isSuccess()) {
-                ImageInfo data = (ImageInfo) commonResult.getData();
-                CommonResult<?> commonResult1 = imageInfoService.insertOriginSmallRelation((long) id, data.getId());
-                if (commonResult1.isSuccess())
-                    log.info("图像信息保存成功:[{}]-[{}]", id, data.getId());
+            if (result.isSuccess()) {
+                log.info("{}", result.getData());
+                if (result.getData().equals("")) return;
+                JSONObject jsonObject = JSONObject.parseObject((String) result.getData());
+                //json对象转Map
+                Map<String, Object> map = (Map<String, Object>) jsonObject;
+                int id = (Integer) map.get("id");
+                String smallImagePath = (String) map.get("result");
+                CommonResult<?> commonResult = imageInfoService.saveImageInfo(Path.of(smallImagePath), false);
+                if (commonResult.isSuccess()) {
+                    ImageInfo data = (ImageInfo) commonResult.getData();
+                    CommonResult<?> commonResult1 = imageInfoService.insertOriginSmallRelation((long) id, data.getId());
+                    if (commonResult1.isSuccess())
+                        log.info("图像信息保存成功:[{}]-[{}]", id, data.getId());
+                } else {
+                    log.error(commonResult.toString());
+                }
+                log.info("{}:[{}][{}]", "接收到信息", id, smallImagePath);
             } else {
-                log.info("{}", commonResult);
+                log.error(result.toString());
             }
-            log.info("{}:[{}][{}]", "接收到信息", id, smallImagePath);
         }
     }
 

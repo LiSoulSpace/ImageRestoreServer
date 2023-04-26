@@ -66,6 +66,16 @@ public class ImageInfoController {
         return ResponseEntity.ok(CommonResult.success("success", JSON.toJSONString(imagePathPage)));
     }
 
+    @Operation(summary = "分页获取图像基本信息")
+    @RequestMapping(value = "/getImageBaseInfoPage", method = RequestMethod.GET)
+    public ResponseEntity<?> getImageBaseInfoPage(@Param("currentPage") Integer currentPage,
+                                                  @Param("pageSize") Integer pageSize) {
+        CommonResult<?> imageBaseInfoPage = imageInfoService.getImageBaseInfoPage(currentPage, pageSize);
+        if (imageBaseInfoPage.isSuccess())
+            return ResponseEntity.ok(imageBaseInfoPage);
+        else return ResponseEntity.internalServerError().body(imageBaseInfoPage);
+    }
+
     @Operation(summary = "获取公共图像数量")
     @RequestMapping(value = "/getPublicImageCount", method = RequestMethod.GET)
     public ResponseEntity<?> getPublicImageCount() {

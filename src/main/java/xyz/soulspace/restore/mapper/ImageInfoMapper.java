@@ -3,6 +3,7 @@ package xyz.soulspace.restore.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import xyz.soulspace.restore.dto.ImageBaseInfoDTO;
 import xyz.soulspace.restore.entity.ImageInfo;
 
 import java.util.List;
@@ -25,9 +26,27 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
 
     int updateImageMd5ByImageName(@Param("imageMd5") String imageMd5, @Param("imageName") String imageName);
 
+    /**
+     * 获取图像的全部信息
+     * @param currentPage 当前页
+     * @param pageSize 每页的信息数量
+     * @param userId 用户id 如果查询公共图像 则为null
+     * @return {@link ImageInfo}
+     */
     List<ImageInfo> selectAllPage(@Param("currentPage") Integer currentPage,
                                   @Param("pageSize") Integer pageSize,
                                   @Param("userId") Long userId);
+
+    /**
+     * 获取图像的基本信息
+     * @param currentPage 当前页
+     * @param pageSize 每页的信息数量
+     * @param userId 用户id 如果查询公共图像 则为null
+     * @return {@link ImageBaseInfoDTO}
+     */
+    List<ImageBaseInfoDTO> selectImageBaseInfoPage(@Param("currentPage") Integer currentPage,
+                                                   @Param("pageSize") Integer pageSize,
+                                                   @Param("userId") Long userId);
 
     int insertUserImageInfo(@Param("userId") Long userId, @Param("imageInfoId") Long imageInfoId);
 

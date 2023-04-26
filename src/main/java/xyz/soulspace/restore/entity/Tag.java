@@ -27,8 +27,8 @@ public class Tag extends Model<Tag> {
     @TableField("tag_name")
     private String tagName;
 
-    @TableField("tag_name_pinyin")
-    private String tagNamePinyin;
+    @TableField("tag_name_alias")
+    private String tagNameAlias;
 
     @TableField("is_public_tag")
     private int isPublicTag;

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
 import xyz.soulspace.restore.service.ImageInfoService;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SpringBootTest
@@ -122,16 +124,26 @@ public class ImageReadSaveTests {
 
     @Test
     void addImageInfoToDBPath() {
-        String path = "/home/soulspace/Documents/GitHub/ImageRestoreServer/img/img_origin/wallpaper";
+//        String path = "/home/soulspace/Documents/GitHub/ImageRestoreServer/img/img_origin/wallpaper";
+        String pathPexels = "/home/soulspace/Documents/GitHub/ImageRestoreServer/img/img_origin/pexels";
         try {
-            addImageInfoToDB(path);
+            CopyOnWriteArrayList<ImageInfo> imageInfos = addImageInfoToDB(pathPexels);
+//            imageInfos.forEach(imageInfo -> {
+//                CommonResult<?> commonResult = imageInfoService.imageFixSmallById(imageInfo.getId());
+//                if (!commonResult.isSuccess()) {
+//                    log.error(commonResult.toString());
+//                } else {
+//                    log.info("{}", commonResult);
+//                }
+//            });
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
     @Test
-    void addImageInfoToDB(String pathToRead) throws IOException {
+    CopyOnWriteArrayList<ImageInfo> addImageInfoToDB(String pathToRead) throws IOException {
+        CopyOnWriteArrayList<ImageInfo> imageInfoList = new CopyOnWriteArrayList<>();
         Path imageWallpaper = Path.of(pathToRead);
         AtomicBoolean test = new AtomicBoolean(true);
         Files.list(imageWallpaper).forEach(file -> {
@@ -184,20 +196,29 @@ public class ImageReadSaveTests {
                                 imageInfo.setImageWidth(Integer.valueOf(map.get("Image Width")));
                                 imageInfo.setImagePath(map.get("imagePath"));
                                 imageInfo.setImageName(map.get("imageName"));
-                                imageInfoMapper.insert(imageInfo);
+                                List<ImageInfo> imageInfos = imageInfoMapper.selectAllByImageMd5(imageInfo.getImageMd5());
+                                if (imageInfos.size() == 0) {
+                                    try {
+                                        imageInfoMapper.insert(imageInfo);
+                                    } catch (Exception e) {
+                                        log.error(e.toString());
+                                    }
+                                } else {
+                                    imageInfo = imageInfos.get(0);
+                                }
+                                imageInfoList.add(imageInfo);
                                 imageInputStream.close();
                             }
                         } catch (ImageProcessingException | IOException e) {
-                            log.error("{}", e);
+                            log.error(String.valueOf(e));
                         }
-
-
                     });
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
+        return imageInfoList;
     }
 
 }

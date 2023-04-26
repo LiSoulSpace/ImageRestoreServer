@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
+import xyz.soulspace.restore.dto.ImageBaseInfoDTO;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.kafka.producer.RestoreProducer;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
@@ -67,6 +68,22 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
     public List<ImageInfo> getImageInfoPage(Integer currentPage, Integer pageSize) {
         List<ImageInfo> imageInfos = imageInfoMapper.selectAllPage(currentPage, pageSize, null);
         return imageInfos;
+    }
+
+    /**
+     * @param currentPage 当前页码
+     * @param pageSize    每页的数量
+     * @return
+     */
+    @Override
+    public CommonResult<?> getImageBaseInfoPage(Integer currentPage, Integer pageSize) {
+        try {
+            List<ImageBaseInfoDTO> baseInfoDTOS = imageInfoMapper.selectImageBaseInfoPage(currentPage, pageSize, null);
+            return CommonResult.success("success", JSON.toJSONString(baseInfoDTOS));
+        } catch (Exception e) {
+            log.error(e.toString());
+            return CommonResult.failed(1, "获取图像基本信息失败", "[]");
+        }
     }
 
     @Override
@@ -201,6 +218,75 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             CommonResult<?> resultImgFix = imageFixSmallById(imageInfo.getId());
             if (!resultImgFix.isSuccess()) return CommonResult.failed(3, "新保存图像缩小化修正失败", resultImgFix);
             return CommonResult.success("图像保存成功", imageInfo);
+        } catch (ImageProcessingException | IOException e) {
+            log.error(e.getMessage());
+            return CommonResult.failed(4, "图像保存失败", e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult<?> saveImageInfo(Path image, boolean isFixSmall) {
+        try {
+            InputStream imageInputStream = Files.newInputStream(image);
+            String fileMD5 = MD5.create().digestHex(imageInputStream);
+            List<ImageInfo> imageInfos = imageInfoMapper.selectAllByImageMd5(fileMD5);
+            if (imageInfos.size() > 0) {
+                CommonResult<?> resultImgFix = imageFixSmallById(imageInfos.get(0).getId());
+                if (!resultImgFix.isSuccess()) return CommonResult.failed(2, "图像缩小化修正失败", resultImgFix);
+                return CommonResult.failed(1, "图像已经存在", imageInfos.get(0));
+            }
+            imageInputStream.close();
+            imageInputStream = Files.newInputStream(image);
+            Metadata metadata = ImageMetadataReader.readMetadata(imageInputStream);
+            HashMap<String, String> map = new HashMap<>();
+            Set<String> set = new HashSet<>();
+            set.add("Detected File Type Name");
+            set.add("Image Height");
+            set.add("Image Width");
+            map.put("imageName", String.valueOf(image.getFileName()));
+            map.put("imagePath", image.toString().substring(dataPath.length()));
+            map.put("imageMd5", fileMD5);
+
+            boolean isHeightSaved = false;
+            boolean isWidthSaved = false;
+
+            for (Directory directory : metadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    if (set.contains(tag.getTagName())) {
+                        if (tag.getTagName().equals("Image Height") && !isHeightSaved) {
+                            log.info("{}:{}", tag.getTagName(), tag.getDescription());
+                            map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                            isHeightSaved = true;
+                        } else if (tag.getTagName().equals("Image Width") && !isWidthSaved) {
+                            log.info("{}:{}", tag.getTagName(), tag.getDescription());
+                            map.put(tag.getTagName(), tag.getDescription().split(" ")[0]);
+                            isWidthSaved = true;
+                        } else {
+                            String tagName = tag.getTagName();  //标签名
+                            String desc = tag.getDescription(); //标签信息
+                            if (tagName.equals("Image Height") || tagName.equals("Image Width"))
+                                continue;
+                            map.put(tagName, desc);
+                        }
+                    }
+                }
+            }
+            log.info("Map of savedImageInfo_{} : {}", image, map);
+            ImageInfo imageInfo = new ImageInfo();
+            imageInfo.setImageType(map.get("Detected File Type Name"));
+            imageInfo.setImageMd5(map.get("imageMd5"));
+            imageInfo.setImageHeight(Integer.valueOf(map.get("Image Height")));
+            imageInfo.setImageWidth(Integer.valueOf(map.get("Image Width")));
+            imageInfo.setImagePath(map.get("imagePath"));
+            imageInfo.setImageName(map.get("imageName"));
+            imageInfoMapper.insert(imageInfo);
+            if (isFixSmall) {
+                CommonResult<?> resultImgFix = imageFixSmallById(imageInfo.getId());
+                if (!resultImgFix.isSuccess()) return CommonResult.failed(3, "新保存图像缩小化修正失败", resultImgFix);
+                return CommonResult.success("图像保存成功", imageInfo);
+            } else {
+                return CommonResult.success("图像保存成功，未进行缩小化处理", imageInfo);
+            }
         } catch (ImageProcessingException | IOException e) {
             log.error(e.getMessage());
             return CommonResult.failed(4, "图像保存失败", e.getMessage());
