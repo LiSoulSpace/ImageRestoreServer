@@ -4,14 +4,14 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.User">
-        <id column="id" property="id" />
-        <result column="username" property="username" />
-        <result column="description" property="description" />
-        <result column="password" property="password" />
-        <result column="nickname" property="nickname" />
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="description" property="description"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
         <result column="avatar_image_id" property="avatarImageId"/>
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -43,8 +43,19 @@
 
     <select id="selectIdAndNicknameAndAvatarImageUriByUsername" resultType="xyz.soulspace.restore.dto.UserBasicDTO">
         select um_t_user.id as user_id, um_t_user.nickname as nickname, im_i_image_info.image_path as avatar_uri
-        from um_t_user, im_i_image_info
+        from um_t_user,
+             im_i_image_info
         where username = #{username,jdbcType=VARCHAR}
-            and im_i_image_info.id = um_t_user.avatar_image_id
+          and im_i_image_info.id = um_t_user.avatar_image_id
+    </select>
+
+    <select id="selectRoleById" resultType="xyz.soulspace.restore.entity.Role">
+        select utr.id, utr.description, utr.name, utr.role, utr.create_time, utr.update_time
+        from um_t_user utu,
+             um_t_role utr,
+             um_t_role_user utru
+        where utu.id = #{id,jdbcType=NUMERIC}
+          and utu.id = utru.user_id
+          and utru.role_id = utr.id;
     </select>
 </mapper>

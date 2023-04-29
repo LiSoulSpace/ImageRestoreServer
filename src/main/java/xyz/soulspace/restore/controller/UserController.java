@@ -2,16 +2,16 @@ package xyz.soulspace.restore.controller;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.digest.MD5;
+import com.alibaba.fastjson.JSON;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.dto.UserBasicDTO;
@@ -122,4 +122,21 @@ public class UserController {
         return ResponseEntity.ok(userId);
     }
 
+    @Operation(summary = "获取用户角色信息")
+    @RequestMapping(value = "/getRoleInfoByUserId", method = RequestMethod.GET)
+    public ResponseEntity<?> getRoleInfoByUserId(@Param("userId") Long userId) {
+        CommonResult<?> commonResult = userService.selectRoleByUserId(userId);
+        if (commonResult.isSuccess())
+            return ResponseEntity.ok(JSON.toJSONString(commonResult));
+        else return ResponseEntity.internalServerError().body(JSON.toJSONString(commonResult));
+    }
+
+    @Operation(summary = "判断是否为管理员")
+    @RequestMapping(value = "/checkIsAdminByUserId", method = RequestMethod.GET)
+    public ResponseEntity<?> checkIsAdminByUserId(@Param("userId") Long userId) {
+        CommonResult<?> commonResult = userService.checkIsAdminByUserId(userId);
+        if (commonResult.isSuccess())
+            return ResponseEntity.ok(JSON.toJSONString(commonResult));
+        else return ResponseEntity.internalServerError().body(JSON.toJSONString(commonResult));
+    }
 }

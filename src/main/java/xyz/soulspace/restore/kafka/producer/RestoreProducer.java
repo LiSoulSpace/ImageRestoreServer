@@ -76,8 +76,33 @@ public class RestoreProducer {
             JSONObject imageInfoJson = (JSONObject) JSON.toJSON(imageInfo);
             log.info("需要去噪的图像信息 : [{}]", imageInfoJson);
             ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send(
-                    "topic-image-denoising", 0,
+                    "topic-image-restore", 0,
                     "imageInfo-denoising", imageInfoJson.toJSONString());
+            send.addCallback(new ListenableFutureCallback<>() {
+                @Override
+                public void onFailure(Throwable ex) {
+                    log.error(ex.getMessage());
+                }
+
+                @Override
+                public void onSuccess(SendResult<String, String> result) {
+                    log.info("修改图像大小-图像信息发送完成 : [{}]", result.toString());
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean sendImageInfoForColorize(ImageInfo imageInfo) {
+        try {
+            JSONObject imageInfoJson = (JSONObject) JSON.toJSON(imageInfo);
+            log.info("需要去噪的图像信息 : [{}]", imageInfoJson);
+            ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send(
+                    "topic-image-restore", 0,
+                    "imageInfo-colorize", imageInfoJson.toJSONString());
             send.addCallback(new ListenableFutureCallback<>() {
                 @Override
                 public void onFailure(Throwable ex) {

@@ -2,7 +2,8 @@ package xyz.soulspace.restore.service.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
-//import jakarta.servlet.http.HttpServletRequest;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.component.security.AppUserDetails;
 import xyz.soulspace.restore.dto.UserBasicDTO;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.entity.Permission;
+import xyz.soulspace.restore.entity.Role;
 import xyz.soulspace.restore.entity.User;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
 import xyz.soulspace.restore.mapper.RoleUserMapper;
@@ -23,8 +27,6 @@ import xyz.soulspace.restore.mapper.UserMapper;
 import xyz.soulspace.restore.redis.RedisService;
 import xyz.soulspace.restore.service.UserCacheService;
 import xyz.soulspace.restore.service.UserService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
 import xyz.soulspace.restore.util.JwtTokenUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -218,5 +220,35 @@ public class UserServiceImp extends ServiceImpl<UserMapper, User> implements Use
     public UserBasicDTO whoAmI(HttpServletRequest request) {
         String token = request.getHeader(tokenHeader);
         return whoAmI(token);
+    }
+
+    /**
+     * @param userId 用户id
+     * @return {@link CommonResult} 0-成功 1-获取失败
+     */
+    @Override
+    public CommonResult<?> selectRoleByUserId(Long userId) {
+        try {
+            Role role = userMapper.selectRoleById(userId);
+            return CommonResult.success(JSON.toJSONString(role));
+        } catch (Exception e) {
+            return CommonResult.failed(1, "获取用户对应的角色信息失败", e.toString());
+        }
+    }
+
+    /**
+     * @param userId 用户id
+     * @return {@link CommonResult}
+     */
+    @Override
+    public CommonResult<?> checkIsAdminByUserId(Long userId) {
+        try {
+            Role role = userMapper.selectRoleById(userId);
+            if (role.getRole().equals("ADMIN")) {
+                return CommonResult.success(1);
+            } else return CommonResult.success(0);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "判断管理员身份时出现问题", e.toString());
+        }
     }
 }

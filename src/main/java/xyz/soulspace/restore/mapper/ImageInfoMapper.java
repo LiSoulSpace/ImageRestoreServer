@@ -48,6 +48,12 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
                                                    @Param("pageSize") Integer pageSize,
                                                    @Param("userId") Long userId);
 
+    /**
+     * 获取数据表中的数据条数
+     * @return {@link Integer}
+     */
+    Integer countAll();
+
     int insertUserImageInfo(@Param("userId") Long userId, @Param("imageInfoId") Long imageInfoId);
 
     List<ImageInfo> selectAllByUserId(@Param("id") Long userId);

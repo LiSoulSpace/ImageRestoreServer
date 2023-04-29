@@ -66,6 +66,15 @@ public class ImageInfoController {
         return ResponseEntity.ok(CommonResult.success("success", JSON.toJSONString(imagePathPage)));
     }
 
+    @Operation(summary = "获取图像信息的数量")
+    @RequestMapping(value = "/getImageInfoCount", method = RequestMethod.GET)
+    public ResponseEntity<?> getImageInfoCount() {
+        CommonResult<?> imageInfoCount = imageInfoService.getImageInfoCount();
+        if (imageInfoCount.isSuccess())
+            return ResponseEntity.ok(JSON.toJSONString(imageInfoCount));
+        else return ResponseEntity.internalServerError().body(JSON.toJSONString(imageInfoCount));
+    }
+
     @Operation(summary = "分页获取图像基本信息")
     @RequestMapping(value = "/getImageBaseInfoPage", method = RequestMethod.GET)
     public ResponseEntity<?> getImageBaseInfoPage(@Param("currentPage") Integer currentPage,
@@ -74,22 +83,6 @@ public class ImageInfoController {
         if (imageBaseInfoPage.isSuccess())
             return ResponseEntity.ok(imageBaseInfoPage);
         else return ResponseEntity.internalServerError().body(imageBaseInfoPage);
-    }
-
-    @Operation(summary = "获取公共图像数量")
-    @RequestMapping(value = "/getPublicImageCount", method = RequestMethod.GET)
-    public ResponseEntity<?> getPublicImageCount() {
-        CommonResult<?> countByUserId = imageInfoService.countByUserId(null);
-        return ResponseEntity.ok(countByUserId);
-    }
-
-    @Operation(summary = "根据用户id获取对应的图像数量")
-    @RequestMapping(value = "/getImageCountByUserId", method = RequestMethod.GET)
-    public ResponseEntity<?> getImageCountByUserId(
-            @RequestParam(value = "userId") Long userId
-    ) {
-        CommonResult<?> countByUserId = imageInfoService.countByUserId(userId);
-        return ResponseEntity.ok(countByUserId);
     }
 
     @Operation(summary = "分页获取某一用户图像所有信息")
@@ -124,6 +117,15 @@ public class ImageInfoController {
         if (commonResult.getCode() == 0)
             return ResponseEntity.ok(commonResult);
         else return ResponseEntity.internalServerError().body(commonResult);
+    }
+
+    @Operation(summary = "通过图像id 图像上色")
+    @RequestMapping(value = "imageColorizeById", method = RequestMethod.POST)
+    public ResponseEntity<?> imageColorizeById(Long imageId) {
+        CommonResult<?> commonResult = imageInfoService.imageColorizeById(imageId);
+        if (commonResult.isSuccess())
+            return ResponseEntity.ok(JSON.toJSONString(commonResult));
+        else return ResponseEntity.internalServerError().body(JSON.toJSONString(commonResult));
     }
 
     @Operation(summary = "通过图像id 生成图像缩略图")

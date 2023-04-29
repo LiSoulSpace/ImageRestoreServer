@@ -1,14 +1,16 @@
 package xyz.soulspace.restore.mapper;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
-import xyz.soulspace.restore.entity.OriginSmallRelation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import xyz.soulspace.restore.dto.ImageBaseInfoDTO;
+import xyz.soulspace.restore.entity.OriginSmallRelation;
+
+import java.util.List;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author soulspace
@@ -19,6 +21,7 @@ public interface OriginSmallRelationMapper extends BaseMapper<OriginSmallRelatio
 
     /**
      * 选取公开的图片关系信息
+     *
      * @param isPublic 是否为公开图片 是-1 否-0
      * @return List {@link OriginSmallRelation}
      */
@@ -26,9 +29,9 @@ public interface OriginSmallRelationMapper extends BaseMapper<OriginSmallRelatio
 
     /**
      * 根据是否公开获取图像的数量
+     *
      * @param isPublic 是否为公开图片 是-1 否-0
      * @return {@link Integer}
-     *
      */
     Integer countByIsPublic(@Param("isPublic") Byte isPublic);
 }

@@ -116,6 +116,10 @@
         from im_i_origin_small_relation
         where origin_img_id = #{originId}
     </select>
+    <select id="countAll" resultType="java.lang.Integer">
+        select count(*)
+        from im_i_image_info
+    </select>
 
     <delete id="deleteUserImageRelaByImageInfoId">
         delete

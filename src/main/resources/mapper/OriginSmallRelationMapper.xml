@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="origin_img_id" property="originImgId" />
         <result column="small_img_id" property="smallImgId" />
-        <result column="is_public" property="public" />
+        <result column="is_public" property="isPublic" />
         <result column="description" property="description" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />

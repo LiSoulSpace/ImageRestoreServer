@@ -71,6 +71,19 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
     }
 
     /**
+     * @return
+     */
+    @Override
+    public CommonResult<?> getImageInfoCount() {
+        try {
+            Integer integer = imageInfoMapper.countAll();
+            return CommonResult.success(integer);
+        } catch (Exception e) {
+            return CommonResult.failed(1, "获取图像信息表数据数量出错", "");
+        }
+    }
+
+    /**
      * @param currentPage 当前页码
      * @param pageSize    每页的数量
      * @return
@@ -79,6 +92,23 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
     public CommonResult<?> getImageBaseInfoPage(Integer currentPage, Integer pageSize) {
         try {
             List<ImageBaseInfoDTO> baseInfoDTOS = imageInfoMapper.selectImageBaseInfoPage(currentPage, pageSize, null);
+            return CommonResult.success("success", JSON.toJSONString(baseInfoDTOS));
+        } catch (Exception e) {
+            log.error(e.toString());
+            return CommonResult.failed(1, "获取图像基本信息失败", "[]");
+        }
+    }
+
+    /**
+     * @param currentPage 当前页码
+     * @param pageSize    每页的数量
+     * @param userId      用户id
+     * @return
+     */
+    @Override
+    public CommonResult<?> getImageBaseInfoPage(Integer currentPage, Integer pageSize, Long userId) {
+        try {
+            List<ImageBaseInfoDTO> baseInfoDTOS = imageInfoMapper.selectImageBaseInfoPage(currentPage, pageSize, userId);
             return CommonResult.success("success", JSON.toJSONString(baseInfoDTOS));
         } catch (Exception e) {
             log.error(e.toString());
@@ -363,5 +393,14 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             else return CommonResult.failed(1, "删除图像信息失败", null);
         } else
             return CommonResult.failed(2, "删除图像用户联系信息失败", null);
+    }
+
+    /**
+     * @param imageId
+     * @return
+     */
+    @Override
+    public CommonResult<?> imageColorizeById(Long imageId) {
+        return null;
     }
 }

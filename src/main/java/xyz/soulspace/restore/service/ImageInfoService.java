@@ -38,12 +38,27 @@ public interface ImageInfoService extends IService<ImageInfo> {
     List<ImageInfo> getImageInfoPage(Integer currentPage, Integer pageSize);
 
     /**
-     * 分页获取图像基本信息(通过图像原图与缩略图的关系表)
+     * 获取图像信息的全部数量 (数据表中的数据数量，用于管理员的处理)
+     * @return {@link Integer}
+     */
+    CommonResult<?> getImageInfoCount();
+
+    /**
+     * 分页获取公开图像基本信息 (通过图像原图与缩略图的关系表)
      * @param currentPage 当前页码
      * @param pageSize 每页的数量
      * @return
      */
     CommonResult<?> getImageBaseInfoPage(Integer currentPage, Integer pageSize);
+
+    /**
+     * 分页获取用户的图像基本信息 (通过图像原图与缩略图的关系表)
+     * @param currentPage 当前页码
+     * @param pageSize 每页的数量
+     * @param userId 用户id
+     * @return
+     */
+    CommonResult<?> getImageBaseInfoPage(Integer currentPage, Integer pageSize, Long userId);
 
     List<ImageInfo> getImageInfoPageByUserId(Integer currentPage, Integer pageSize, Long userId);
 
@@ -117,4 +132,6 @@ public interface ImageInfoService extends IService<ImageInfo> {
     CommonResult<?> insertOriginSmallRelation(Long originImageId, Long smallImageId);
 
     CommonResult<?> deleteImageInfoById(Long imageId);
+
+    CommonResult<?> imageColorizeById(Long imageId);
 }
