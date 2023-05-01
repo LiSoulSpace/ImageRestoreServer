@@ -120,6 +120,10 @@
         select count(*)
         from im_i_image_info
     </select>
+    <select id="selectImageMaxWidHei" resultType="xyz.soulspace.restore.dto.ImgMaxWidHei">
+        select max(image_width), max(image_height)
+        from im_i_image_info;
+    </select>
 
     <delete id="deleteUserImageRelaByImageInfoId">
         delete

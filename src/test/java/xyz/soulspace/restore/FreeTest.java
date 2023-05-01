@@ -49,4 +49,12 @@ public class FreeTest {
         JSONObject jsonObject = JSON.parseObject(s);
         log.info(jsonObject.toString());
     }
+
+    @Test
+    void testListInJSON(){
+        String s = "hello,test,test2";
+        String[] split = s.split(",");
+        Object json = JSON.toJSON(split);
+        System.out.println(json);
+    }
 }

@@ -16,6 +16,7 @@ public class ImageInfoTest {
     @Autowired
     ImageInfoMapper imageInfoMapper;
 
+
     @Test
     void getInfoByMd5Test() {
         List<ImageInfo> imageInfos = imageInfoMapper.selectAllByImageMd5("");

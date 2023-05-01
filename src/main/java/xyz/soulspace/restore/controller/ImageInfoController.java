@@ -66,6 +66,15 @@ public class ImageInfoController {
         return ResponseEntity.ok(CommonResult.success("success", JSON.toJSONString(imagePathPage)));
     }
 
+    @Operation(summary = "获取图像最大的宽度和高度")
+    @RequestMapping(value = "/getImageMaxWidHei", method = RequestMethod.GET)
+    public ResponseEntity<?> getImageMaxWidHei() {
+        CommonResult<?> imageMaxWidHei = imageInfoService.getImageMaxWidHei();
+        if (imageMaxWidHei.isSuccess())
+            return ResponseEntity.ok(JSON.toJSONString(imageMaxWidHei));
+        else return ResponseEntity.internalServerError().body(JSON.toJSONString(imageMaxWidHei));
+    }
+
     @Operation(summary = "获取图像信息的数量")
     @RequestMapping(value = "/getImageInfoCount", method = RequestMethod.GET)
     public ResponseEntity<?> getImageInfoCount() {

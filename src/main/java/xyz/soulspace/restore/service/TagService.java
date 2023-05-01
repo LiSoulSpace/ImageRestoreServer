@@ -66,7 +66,7 @@ public interface TagService extends IService<Tag> {
     CommonResult<?> getMainTags();
 
     /**
-     * 获取公共标签
+     * 获取公共标签(排除主要标签)
      *
      * @return {@link CommonResult}
      */

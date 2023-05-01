@@ -44,6 +44,12 @@ public interface ImageInfoService extends IService<ImageInfo> {
     CommonResult<?> getImageInfoCount();
 
     /**
+     * 获取图像的最大宽度和高度
+     * @return {@link CommonResult}
+     */
+    CommonResult<?> getImageMaxWidHei();
+
+    /**
      * 分页获取公开图像基本信息 (通过图像原图与缩略图的关系表)
      * @param currentPage 当前页码
      * @param pageSize 每页的数量

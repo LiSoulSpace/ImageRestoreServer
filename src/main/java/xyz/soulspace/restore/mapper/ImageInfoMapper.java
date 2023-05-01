@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import xyz.soulspace.restore.dto.ImageBaseInfoDTO;
+import xyz.soulspace.restore.dto.ImgMaxWidHei;
 import xyz.soulspace.restore.entity.ImageInfo;
 
 import java.util.List;
@@ -53,6 +54,8 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
      * @return {@link Integer}
      */
     Integer countAll();
+
+    ImgMaxWidHei selectImageMaxWidHei();
 
     int insertUserImageInfo(@Param("userId") Long userId, @Param("imageInfoId") Long imageInfoId);
 

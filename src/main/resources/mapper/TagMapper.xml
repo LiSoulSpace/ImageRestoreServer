@@ -15,7 +15,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , tag_name, tag_name_pinyin,is_public_tag,is_main_tag, tag_creator_id, create_time, update_time
+        , tag_name, tag_name_alias,is_public_tag,is_main_tag, tag_creator_id, create_time, update_time
     </sql>
 
     <insert id="insertTagImageRelation">
@@ -80,7 +80,7 @@
         select
         <include refid="Base_Column_List"/>
         from im_i_tag
-        where is_public_tag=1
+        where is_public_tag=1 and is_main_tag=0
     </select>
 
 </mapper>

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.dto.ImageBaseInfoDTO;
+import xyz.soulspace.restore.dto.ImgMaxWidHei;
 import xyz.soulspace.restore.entity.ImageInfo;
 import xyz.soulspace.restore.kafka.producer.RestoreProducer;
 import xyz.soulspace.restore.mapper.ImageInfoMapper;
@@ -80,6 +81,19 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
             return CommonResult.success(integer);
         } catch (Exception e) {
             return CommonResult.failed(1, "获取图像信息表数据数量出错", "");
+        }
+    }
+
+    /**
+     * @return 
+     */
+    @Override
+    public CommonResult<?> getImageMaxWidHei() {
+        try {
+            ImgMaxWidHei imgMaxWidHei = imageInfoMapper.selectImageMaxWidHei();
+            return CommonResult.success(JSON.toJSONString(imgMaxWidHei));
+        }catch (Exception e){
+            return CommonResult.failed(1, "获取图像最大宽度高度失败", "");
         }
     }
 

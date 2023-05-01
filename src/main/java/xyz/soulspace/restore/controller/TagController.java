@@ -2,7 +2,6 @@ package xyz.soulspace.restore.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-//import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +76,13 @@ public class TagController {
         else return ResponseEntity.internalServerError().body(tagsByCreatorIdPage);
     }
 
+    @Operation(summary = "获取全部标签信息")
+    @RequestMapping(value = "getTagsAll", method = RequestMethod.GET)
+    public ResponseEntity<?> getTagsAll() {
+
+        return ResponseEntity.ok("");
+    }
+
     @Operation(summary = "通过创建者id获取全部标签(Tag)信息")
     @RequestMapping(value = "getTagsByCreatorId", method = RequestMethod.GET)
     public ResponseEntity<?> getTagsByCreatorId(@Param("creatorId") Integer creatorId) {
@@ -101,7 +107,7 @@ public class TagController {
         else return ResponseEntity.internalServerError().body(mainTags);
     }
 
-    @Operation(summary = "获取公共标签")
+    @Operation(summary = "获取公共标签(排除主要标签)")
     @RequestMapping(value = "getPublicTags", method = RequestMethod.GET)
     public ResponseEntity<?> getPublicTags() {
         CommonResult<?> publicTags = tagService.getPublicTags();
