@@ -41,4 +41,6 @@ public class ImageFixTest {
         Long aLong = imageInfoMapper.selectSmallByOrigin(888L);
         log.info("{}", aLong);
     }
+
+
 }

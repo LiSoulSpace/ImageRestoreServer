@@ -2,9 +2,11 @@ package xyz.soulspace.restore.controller;
 
 import com.alibaba.fastjson.JSON;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +23,8 @@ import xyz.soulspace.restore.service.OriginSmallRelationService;
  * @since 2023-04-26 10:31:06
  */
 @Controller
+@CrossOrigin
+@Tag(name = "原图缩略图控制器(ImageInfoController)")
 @RequestMapping("/restore/imageInfo")
 public class OriginSmallRelationController {
     @Autowired

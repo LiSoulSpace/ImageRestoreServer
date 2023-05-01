@@ -34,7 +34,7 @@ public class Generator {
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(
-                            "im_i_origin_small_relation"
+                            "im_i_image_tag_relation"
                             )
                             .addTablePrefix("main_", "um_t_", "im_i_")
                             .addTableSuffix("_table")
