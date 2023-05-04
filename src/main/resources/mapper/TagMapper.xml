@@ -26,6 +26,20 @@
         insert into im_i_tag (tag_name, tag_creator_id)
             value (#{tagName}, #{userId})
     </insert>
+    <select id="countImageByTag" resultType="java.lang.Integer">
+        select count(*) from im_i_image_info where id in
+        (
+        select distinct r_0.image_id
+        from im_i_image_tag_relation as r_0
+        <foreach item="item" index="index" collection="tags"
+                 nullable="true">
+            inner join (select image_id
+            from im_i_image_tag_relation
+            where tag_id = #{item}) as r${index}
+            on r_0.image_id = r${index}.image_id
+        </foreach>
+        )
+    </select>
     <select id="findImageByTag" resultType="xyz.soulspace.restore.entity.ImageInfo">
         select * from im_i_image_info where id in
         (
@@ -39,6 +53,60 @@
             on r_0.image_id = r${index}.image_id
         </foreach>
         )
+    </select>
+
+    <select id="selectImageBaseInfoByTagPage" resultType="xyz.soulspace.restore.dto.ImageBaseInfoDTO">
+        select iiii.image_name, iiii.image_path as source_path, iiii2.image_path as thumbnail_path, iiii.image_md5
+        from im_i_image_info iiii
+        join im_i_origin_small_relation iiosr on iiii.id = iiosr.origin_img_id
+        join im_i_image_info iiii2 on iiosr.small_img_id = iiii2.id
+        <if test="userId != null">
+            , im_i_user_image_info iiuii
+            where iiuii.user_id= #{userId}
+            and iiosr.origin_img_id = iiuii.image_info_id
+            and iiosr.origin_img_id in (
+            select distinct r_0.image_id
+            from im_i_image_tag_relation as r_0
+            <foreach item="item" index="index" collection="tags"
+                     nullable="true">
+                inner join (select image_id
+                from im_i_image_tag_relation
+                where tag_id = #{item}) as r${index}
+                on r_0.image_id = r${index}.image_id
+            </foreach>
+            )
+        </if>
+        <if test="userId == null">
+            where iiosr.is_public=1
+            and iiosr.origin_img_id in (
+            select distinct r_0.image_id
+            from im_i_image_tag_relation as r_0
+            <foreach item="item" index="index" collection="tags"
+                     nullable="true">
+                inner join (select image_id
+                from im_i_image_tag_relation
+                where tag_id = #{item}) as r${index}
+                on r_0.image_id = r${index}.image_id
+            </foreach>
+            )
+        </if>
+        limit ${pageSize*(currentPage-1)},#{pageSize};
+    </select>
+
+    <select id="findImageByTagPage" resultType="xyz.soulspace.restore.entity.ImageInfo">
+        select * from im_i_image_info where id in
+        (
+        select distinct r_0.image_id
+        from im_i_image_tag_relation as r_0
+        <foreach item="item" index="index" collection="tags"
+                 nullable="true">
+            inner join (select image_id
+            from im_i_image_tag_relation
+            where tag_id = #{item}) as r${index}
+            on r_0.image_id = r${index}.image_id
+        </foreach>
+        )
+        limit ${pageSize*(currentPage-1)},#{pageSize}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select
@@ -54,6 +122,7 @@
             #{item}
         </foreach>
     </select>
+
     <select id="selectAllPage" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -82,5 +151,12 @@
         from im_i_tag
         where is_public_tag=1 and is_main_tag=0
     </select>
+    <select id="getAllTags" resultType="xyz.soulspace.restore.entity.Tag">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_tag
+    </select>
+
+
 
 </mapper>

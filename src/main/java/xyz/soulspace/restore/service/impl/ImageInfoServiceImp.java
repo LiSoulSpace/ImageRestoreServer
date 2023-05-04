@@ -378,7 +378,6 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
     @Override
     public CommonResult<?> imageFixSmallById(Long id) {
         List<ImageInfo> imageInfos = imageInfoMapper.selectById(id);
-        log.info("将要转换小图片的图像信息:{}", imageInfos);
         if (imageInfos.size() == 0) {
             return CommonResult.failed(1, "没有找到id对应的图片", "");
         } else {
@@ -415,6 +414,14 @@ public class ImageInfoServiceImp extends ServiceImpl<ImageInfoMapper, ImageInfo>
      */
     @Override
     public CommonResult<?> imageColorizeById(Long imageId) {
-        return null;
+        List<ImageInfo> imageInfos = imageInfoMapper.selectById(imageId);
+        if (imageInfos.size() == 0) {
+            return CommonResult.failed(1, "图像上色-没有找到id对应的图片", "");
+        } else {
+            ImageInfo imageInfo = imageInfos.get(0);
+            boolean b = restoreProducer.sendImageInfoForColorize(imageInfo);
+            if (b) return CommonResult.success("图像上色-图像信息上传成功", "");
+            else return CommonResult.failed(2, "图像上色-发送信息失败", "");
+        }
     }
 }

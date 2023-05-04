@@ -2,6 +2,7 @@ package xyz.soulspace.restore.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.soulspace.restore.api.CommonResult;
@@ -21,6 +22,7 @@ import java.util.List;
  * @since 2023-03-27 04:00:28
  */
 @Service
+@Slf4j
 public class TagServiceImp extends ServiceImpl<TagMapper, Tag> implements TagService {
     @Autowired
     TagMapper tagMapper;
@@ -50,6 +52,22 @@ public class TagServiceImp extends ServiceImpl<TagMapper, Tag> implements TagSer
     }
 
     /**
+     * @param tags 标签列表
+     * @return
+     */
+    @Override
+    public CommonResult<?> countImageByTags(List<String> tags) {
+        try {
+            List<Long> tagsLong = tagMapper.findAllByTagNames(tags).stream().map(Tag::getId).toList();
+            log.info("{}", tagsLong);
+            Integer integer = tagMapper.countImageByTag(tagsLong);
+            return CommonResult.success("图像数量", integer);
+        } catch (Exception e) {
+            return CommonResult.failed(2, "根据标签计算图像数量失败", e.getMessage());
+        }
+    }
+
+    /**
      * @param tags
      * @return
      */
@@ -58,6 +76,23 @@ public class TagServiceImp extends ServiceImpl<TagMapper, Tag> implements TagSer
         try {
             List<Long> tagsLong = tagMapper.findAllByTagNames(tags).stream().map(Tag::getId).toList();
             List<ImageInfo> image = tagMapper.findImageByTag(tagsLong);
+            return CommonResult.success("图像信息寻找完成", image);
+        } catch (Exception e) {
+            return CommonResult.failed(2, "图像信息寻找失败", e.getMessage());
+        }
+    }
+
+    /**
+     * @param tags        标签信息 String
+     * @param currentPage 当前页
+     * @param pageSize    每页数量
+     * @return
+     */
+    @Override
+    public CommonResult<?> findImageByTagsPage(List<String> tags, Integer currentPage, Integer pageSize) {
+        try {
+            List<Long> tagsLong = tagMapper.findAllByTagNames(tags).stream().map(Tag::getId).toList();
+            List<ImageInfo> image = tagMapper.findImageByTagPage(tagsLong, currentPage, pageSize);
             return CommonResult.success("图像信息寻找完成", image);
         } catch (Exception e) {
             return CommonResult.failed(2, "图像信息寻找失败", e.getMessage());
@@ -117,6 +152,19 @@ public class TagServiceImp extends ServiceImpl<TagMapper, Tag> implements TagSer
             return CommonResult.success("公共标签", publicTags);
         } catch (Exception e) {
             return CommonResult.failed(1, "公共标签获取失败", e.getMessage());
+        }
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public CommonResult<?> getAllTags() {
+        try {
+            List<Tag> allTags = tagMapper.getAllTags();
+            return CommonResult.success("全部标签", allTags);
+        } catch (Exception e){
+            return CommonResult.failed(1, "全部标签获取失败", e.getMessage());
         }
     }
 }

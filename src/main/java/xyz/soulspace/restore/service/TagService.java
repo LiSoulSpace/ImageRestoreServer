@@ -34,12 +34,28 @@ public interface TagService extends IService<Tag> {
     CommonResult<?> saveTag(String tag, Long userId);
 
     /**
+     * 通过标签获取图像数量
+     * @param tags 标签列表
+     * @return
+     */
+    CommonResult<?> countImageByTags(List<String> tags);
+
+    /**
      * 通过标签查找图片
      *
      * @param tags 标签信息 String
      * @return {@link CommonResult}
      */
     CommonResult<?> findImageByTags(List<String> tags);
+
+    /**
+     * 通过标签分页查找图片
+     * @param tags 标签信息 String
+     * @param currentPage 当前页
+     * @param pageSize 每页数量
+     * @return
+     */
+    CommonResult<?> findImageByTagsPage(List<String> tags, Integer currentPage, Integer pageSize);
 
     /**
      * 分页获取标签
@@ -71,4 +87,10 @@ public interface TagService extends IService<Tag> {
      * @return {@link CommonResult}
      */
     CommonResult<?> getPublicTags();
+
+    /**
+     * 获取全部标签
+     * @return
+     */
+    CommonResult<?> getAllTags();
 }

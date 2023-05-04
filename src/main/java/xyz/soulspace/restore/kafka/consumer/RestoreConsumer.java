@@ -10,8 +10,10 @@ import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.stereotype.Component;
 import xyz.soulspace.restore.api.CommonResult;
 import xyz.soulspace.restore.entity.ImageInfo;
+import xyz.soulspace.restore.entity.ImageRestoreRelation;
 import xyz.soulspace.restore.redis.RedisService;
 import xyz.soulspace.restore.service.ImageInfoService;
+import xyz.soulspace.restore.service.ImageRestoreRelationService;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -23,6 +25,8 @@ public class RestoreConsumer {
     RedisService redisService;
     @Autowired
     ImageInfoService imageInfoService;
+    @Autowired
+    ImageRestoreRelationService imageRestoreRelationService;
 
     @KafkaListener(topics = {"topic-restore-answer"},
             topicPartitions = {@TopicPartition(topic = "topic-restore-answer", partitions = {"0"})},
@@ -34,6 +38,31 @@ public class RestoreConsumer {
         if (key.equals("image_restore_answer")) {
             //TODO: 图像修复的回馈处理还没有写！！！！
             log.info("Answer from 图像修复:[{}]", record.value());
+            CommonResult<?> parse = JSON.parseObject((String) record.value(), CommonResult.class);
+            if (parse.isSuccess()) {
+                Map<String, Object> data = (Map<String, Object>) JSON.parse(parse.getData().toString());
+                Integer originId = (Integer) data.get("origin_id");
+                String result = (String) data.get("result");
+                String type = (String) data.get("type");
+                log.warn("originId:{}, resultPath:{}, type:{}", originId, result, type);
+                CommonResult<?> commonResult = imageInfoService.saveImageInfo(Path.of(result), false);
+                if (commonResult.isSuccess()) {
+                    ImageInfo imageInfo = (ImageInfo) commonResult.getData();
+                    ImageRestoreRelation imageRestoreRelation = new ImageRestoreRelation();
+                    imageRestoreRelation.setRestoreType(type);
+                    imageRestoreRelation.setImageId((long) originId);
+                    imageRestoreRelation.setRestoreImageId(imageInfo.getId());
+                    CommonResult<?> result1 = imageRestoreRelationService.insertImageRestoreRe(Long.valueOf(originId), imageInfo.getId(), type);
+                    if (result1.isSuccess()) {
+                        log.info("{}", result1);
+                    } else {
+                        log.error(result1.toString());
+                    }
+                }
+            } else {
+                log.error(parse.toString());
+            }
+
         } else if (key.equals("image_resize_answer")) {
             log.info("Answer from 图像缩略:[{}]", record.value());
             log.info("开始作后续处理");

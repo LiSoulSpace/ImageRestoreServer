@@ -15,5 +15,18 @@
     <sql id="Base_Column_List">
         id, image_id, tag_id, create_time, update_time
     </sql>
+    <delete id="deleteTagImageRelation">
+        delete from im_i_image_tag_relation
+        where image_id = #{imageId} and tag_id = ${tagId}
+    </delete>
+    <select id="getTagsByImageMd5" resultType="xyz.soulspace.restore.entity.Tag">
+        select im_i_tag.*
+        from im_i_tag
+                 join im_i_image_tag_relation iiitr on im_i_tag.id = iiitr.tag_id
+        where iiitr.image_id in
+              (select id
+               from im_i_image_info iiii
+               where iiii.image_md5 = #{md5})
+    </select>
 
 </mapper>

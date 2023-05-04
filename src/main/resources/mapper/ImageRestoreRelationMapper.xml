@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.soulspace.restore.mapper.ImageRestoreRelationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="xyz.soulspace.restore.entity.ImageRestoreRelation">
+        <id column="id" property="id" />
+        <result column="image_id" property="imageId" />
+        <result column="restore_image_id" property="restoreImageId" />
+        <result column="restore_type" property="restoreType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, image_id, restore_image_id, restore_type, create_time, update_time
+    </sql>
+    <select id="selectByImageIdAndRestoreType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from im_i_image_restore_relation
+        where
+        image_id = #{imageId,jdbcType=NUMERIC}
+        AND restore_type = #{restoreType,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

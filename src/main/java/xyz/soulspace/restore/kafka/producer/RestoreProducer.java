@@ -27,7 +27,7 @@ public class RestoreProducer {
             log.info("需要去模糊的图像信息 : [{}]", imageInfoJson);
             ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send(
                     "topic-image-restore", 0,
-                    "imageInfo", imageInfoJson);
+                    "imageInfo-deblur", imageInfoJson);
             send.addCallback(new ListenableFutureCallback<>() {
                 @Override
                 public void onFailure(Throwable ex) {
@@ -99,7 +99,7 @@ public class RestoreProducer {
     public boolean sendImageInfoForColorize(ImageInfo imageInfo) {
         try {
             JSONObject imageInfoJson = (JSONObject) JSON.toJSON(imageInfo);
-            log.info("需要去噪的图像信息 : [{}]", imageInfoJson);
+            log.info("需要上色的图像信息 : [{}]", imageInfoJson);
             ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send(
                     "topic-image-restore", 0,
                     "imageInfo-colorize", imageInfoJson.toJSONString());
@@ -120,20 +120,4 @@ public class RestoreProducer {
         }
         return false;
     }
-
-//    public String sendString(String order) {
-//        ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send("topic-test", 0, "string", order);
-//        send.addCallback(new ListenableFutureCallback<>() {
-//            @Override
-//            public void onFailure(Throwable ex) {
-//                log.error(ex.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(SendResult<String, String> result) {
-//                log.warn(result.toString());
-//            }
-//        });
-//        return "Send OK";
-//    }
 }
